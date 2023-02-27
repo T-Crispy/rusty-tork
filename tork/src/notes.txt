@@ -1,0 +1,12 @@
+~~file extensions~~
+//both of these will be formatted as JSONs, despite extension
+trksrc - "tork source file" files to build worlds from
+trksav - "tork save file" save file of a world
+    "%DIR_PATH%\[trksrc_file_name]_[save # (1,2, or 3)]"
+
+~~directory structure~~
+%ROOT_DIR%\ - wherever Tork is "installed"
+    worlds\
+        [world_name]\
+            [world_name].trksrc
+    settings.json
