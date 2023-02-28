@@ -10,3 +10,15 @@ trksav - "tork save file" save file of a world
         [world_name]\
             [world_name].trksrc
     settings.json
+
+~~Module Tree~~
+Tork
+    World
+        Room
+            Doorway
+        Character
+        Item
+        Event
+    Builder
+    Driver
+    Parser
