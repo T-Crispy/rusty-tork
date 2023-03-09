@@ -1,0 +1,6 @@
+{
+    "rust-analyzer.signatureInfo.documentation.enable": false,
+    "rust-analyzer.semanticHighlighting.strings.enable": false,
+    "rust-analyzer.semanticHighlighting.operator.enable": false,
+    "rust-analyzer.semanticHighlighting.doc.comment.inject.enable": false
+}

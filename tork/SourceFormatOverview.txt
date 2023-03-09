@@ -1,0 +1,40 @@
+[Name of the world]
+[Rooms]
+    -number of rooms
+    -roomX name
+    -roomX desc
+    -roomX isLit
+    -roomX pathways [N/NE/E/SE/S/SW/W/NW/U/D]       {NULL if path doesn't go anywhere}
+    -roomX pathways names [N/NE/E/SE/S/SW/W/NW/U/D]
+    -roomX pathways desc [N/NE/E/SE/S/SW/W/NW/U/D]
+    -roomX pathways lock [N/NE/E/SE/S/SW/W/NW/U/D]
+    -roomX pathways isHidden [N/NE/E/SE/S/SW/W/NW/U/D]
+[Player]
+    -name
+    -desc
+    -hp
+    -attack
+    -location
+[Charactes]
+    -number of characters (not counting player)
+    -charX name
+    -charX desc
+    -charX type
+    -charX hp
+    -charX attack
+    -charX hitChance
+    -charX location
+[Items]
+    -number of items
+    -itemX name
+    -itemX desc
+    -itemX verbs [verb1/verb2/.../verbN]
+    -itemX itemType
+    -itemX nums [num1/num2/.../numN]
+    -itemX isLit        {t/f}
+    -itemX isFixed      {t/f}
+    -itemX contained [contained_1 ID/ contained_2 ID/.../contained_7 ID]  {-1 for empty slot}
+[Events]
+    -number of events
+    -eventX IF-THEN
+    -eventX persists    {t/f}

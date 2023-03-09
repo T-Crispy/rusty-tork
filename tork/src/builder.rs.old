@@ -1,0 +1,27 @@
+//this file is from testing json serialization
+
+extern crate serde;
+extern crate serde_json;
+use serde::Deserialize;
+
+use std::fs::File;
+
+use crate::world::World;
+
+
+pub fn build_world(filename: String) -> World {
+    //
+    let mut to_build = World{name: String::from("new world"), rooms: Vec::new()};
+    let file_string = "C:\\Repos\\rusty-tork\\test-world.json";
+
+    let file = File::open(filename)
+        .expect("file should open read only");
+    let json: serde_json::Value = serde_json::from_reader(file)
+        .expect("file should be proper JSON");
+    
+    to_build.name = json.get("name")
+        .expect("file should have name key")
+        .to_string();
+
+    to_build
+}

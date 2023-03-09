@@ -8,12 +8,12 @@ pub enum Directions{
 pub struct Room{
     pub name: String,
     pub desc: String,
-    pub id: u32,
+    pub id: usize,
 
     //directions
-    pub north: u32,
-    pub east: u32,
-    pub south: u32,
-    pub west: u32,
+    //pub north: u32,
+    //pub east: u32,
+    //pub south: u32,
+    //pub west: u32,
     pub directions: [*mut Room; 4],
 }

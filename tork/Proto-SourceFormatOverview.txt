@@ -1,0 +1,12 @@
+{Name of the world} + '\n'
+{number of rooms} + '\n'
+[for each room]
+    {room[i] id} + '\n'
+    {room[i] name} + '\n'
+    {room[i] desc} + '\n'
+[for each room]
+    {id of room to N} + '|' +
+    {id of room to E} + '|' +
+    {id of room to S} + '|' +
+    {id of room to W} + '|' + '\n'
+    ("NULL" if that direction can't be traveled)

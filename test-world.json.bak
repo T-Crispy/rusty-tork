@@ -1,0 +1,10 @@
+{
+	"name": "hut",
+	"rooms": [
+		{
+			"name": "outside",
+			"desc": "there is dirt out here",
+			"id": 0
+		}
+	]
+}

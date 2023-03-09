@@ -9,10 +9,13 @@ ___make driver capable of playing through a world
     >just walking between rooms and outputing the name & desc of the room
 */
 
-use world::room::Directions;
 
 fn main() {
     println!("Hello, world!");
 
+    let built_world = 
+        builder::build_world(String::from("C:\\Repos\\rusty-tork\\tork\\house.trksrc"));
     
+    let world_name = &built_world.name;
+    println!("The world name is: {world_name}");
 }
