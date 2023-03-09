@@ -61,7 +61,8 @@ pub fn build_world(filename: String) -> World {
             for j in 0..4 {
                 if paths[j] != "NULL" {
                     let num_id: usize = paths[j].trim().parse::<usize>().unwrap();
-                    to_build.rooms[i].directions[j] = &mut to_build.rooms[num_id];
+                    let room_id: usize = to_build.get_room_index(num_id);
+                    to_build.rooms[i].directions[j] = &mut to_build.rooms[room_id];
                 }
             }
         }
