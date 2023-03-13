@@ -39,15 +39,15 @@ pub fn build_world(filename: String) -> World {
                 name: String::from(""),
                 desc: String::from(""),
                 id: 0,
-                directions: [ptr::null_mut(), 
+                pathways: [ptr::null_mut(), 
                             ptr::null_mut(), 
                             ptr::null_mut(),
                             ptr::null_mut()]
             };
 
             curr_room.id = lines[curr_line + (i * 3)].trim().parse::<usize>().unwrap();
-            curr_room.name = lines[curr_line + (i * 3) + 1].to_string();
-            curr_room.desc = lines[curr_line + (i * 3) + 2].to_string();
+            curr_room.name = lines[curr_line + (i * 3) + 1].trim_matches('\r').to_string();
+            curr_room.desc = lines[curr_line + (i * 3) + 2].trim_matches('\r').to_string();
             to_build.rooms.push(curr_room);
         }
 
@@ -61,8 +61,8 @@ pub fn build_world(filename: String) -> World {
             for j in 0..4 {
                 if paths[j] != "NULL" {
                     let num_id: usize = paths[j].trim().parse::<usize>().unwrap();
-                    let room_id: usize = to_build.get_room_index(num_id);
-                    to_build.rooms[i].directions[j] = &mut to_build.rooms[room_id];
+                    let room_id: usize = to_build.get_room_index(num_id).0;
+                    to_build.rooms[i].pathways[j] = &mut to_build.rooms[room_id];
                 }
             }
         }

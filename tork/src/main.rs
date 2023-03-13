@@ -4,6 +4,9 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 
+use crate::builder::build_world;
+use crate::world::World;
+
 pub mod builder;
 pub mod driver;
 pub mod world;
@@ -42,10 +45,14 @@ fn main() {
         let file = OpenOptions::new().read(true).open(&path);
         if file.is_ok() {
             println!("Building World..");
-            let built_world = 
+            let mut built_world = 
                 builder::build_world(path);
             
-            //call driver
+            println!("Starting..");
+            let result: (&World, bool) = driver::run(&mut built_world);
+            if !result.1 {
+                print!("An Error was encountered while running the world");
+            } 
 
             println!("Would you like to load another world? (Y/N)");
 
