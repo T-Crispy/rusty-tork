@@ -15,5 +15,5 @@ pub struct Room{
     //pub east: u32,
     //pub south: u32,
     //pub west: u32,
-    pub pathways: [*mut Room; 4],
+    pub pathways: [*const Room; 4],
 }

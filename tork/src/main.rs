@@ -4,7 +4,6 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 
-use crate::builder::build_world;
 use crate::world::World;
 
 pub mod builder;
@@ -29,7 +28,7 @@ fn main() {
         //prompt for file name
         //io::stdout().lock().write_all(b"Enter source file name (w/o extension): ");
         print!("Enter source file name (w/o extension): ");
-        io::stdout().flush();
+        io::stdout().flush().expect("");
         
         io::stdin()
             .read_line(&mut file_name)
@@ -45,14 +44,19 @@ fn main() {
         let file = OpenOptions::new().read(true).open(&path);
         if file.is_ok() {
             println!("Building World..");
-            let mut built_world = 
-                builder::build_world(path);
+            let result = builder::build_world(path);
             
-            println!("Starting..");
-            let result: (&World, bool) = driver::run(&mut built_world);
-            if !result.1 {
-                print!("An Error was encountered while running the world");
-            } 
+            if result.1 == String::from("success") {
+                let mut built_world = result.0;
+                println!("Starting {}...",built_world.name);
+                let result: (&World, bool) = driver::run(&mut built_world);
+                if !result.1 {
+                    print!("An Error was encountered while running the world");
+                }
+            }
+            else {
+                println!("There was an error while building\n{}",result.1);
+            }
 
             println!("Would you like to load another world? (Y/N)");
 
@@ -65,7 +69,7 @@ fn main() {
             }
         }
         else {
-            print!("Filename is not good :(");
+            print!("Filename is not good :(\n");
         }
     }
 

@@ -1,4 +1,6 @@
+#world
 House
+#rooms
 8
 0
 Bathroom
@@ -24,6 +26,7 @@ You are in the Pantry, although there does not appear to be any food here.
 7
 Parlor
 You find yourself in the Parlor. There is a couch here and a window allowing sunlight to poor into the room. This room looks like a good place to sit and contemplate your next murder. Who the victim will be, when you shall commit it, and how you shall kill them. The only door is to the EAST.
+#paths
 1|NULL|NULL|NULL
 5|NULL|0|2
 3|1|4|NULL

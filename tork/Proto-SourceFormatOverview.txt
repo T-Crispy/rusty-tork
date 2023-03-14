@@ -1,9 +1,11 @@
+#world
 {Name of the world} + '\n'
-{number of rooms} + '\n'
+"#rooms" + {number of rooms} + '\n'
 [for each room]
     {room[i] id} + '\n'
     {room[i] name} + '\n'
     {room[i] desc} + '\n'
+"#paths" + '\n'
 [for each room]
     {id of room to N} + '|' +
     {id of room to E} + '|' +

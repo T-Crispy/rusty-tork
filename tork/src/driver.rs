@@ -3,7 +3,7 @@ use std::io::Write;
 use std::ptr;
 
 use crate::world::World;
-use crate::world::room::{Room, Directions};
+use crate::world::room::{Directions};
 use crate::world::character::Character;
 
 pub fn run(w: &mut World) -> (&World, bool) {
