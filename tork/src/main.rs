@@ -1,5 +1,5 @@
-use std::env;
-use std::io;
+use std::{io, env};
+//use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
 use std::fs::OpenOptions;
@@ -16,6 +16,8 @@ ___make builder capable to build source file
 ___make driver capable of playing through a world
     >just walking between rooms and outputing the name & desc of the room
 */
+
+//Defining less rooms than is declared "causes the program to immediately crash"
 
 fn main() {
     let dir: PathBuf = env::current_dir().unwrap();
@@ -46,7 +48,11 @@ fn main() {
             println!("Building World..");
             let result = builder::build_world(path);
             
-            if result.1 == String::from("success") {
+            if result.1.contains("success") {
+                if result.1.contains("warn"){
+                    println!("{}",result.1.trim_end_matches("\nsuccess"));
+                }
+
                 let mut built_world = result.0;
                 println!("Starting {}...",built_world.name);
                 let result: (&World, bool) = driver::run(&mut built_world);
@@ -73,7 +79,11 @@ fn main() {
         }
     }
 
-    
-    
+    print!("Tork has finished running. Press Any Key to close Console Window.");
+    io::stdout().flush().expect("");
+    let mut res = String::from("");
+    io::stdin()
+        .read_line(&mut res)
+        .expect("");
     
 }

@@ -1,0 +1,23 @@
+#world
+Test
+#rooms
+#0
+living room
+A small room with wooden floorboards and a fireplace. There is a door to the NORTH and EAST.
+1|2|NULL|NULL
+#1
+kitchen
+A simple kitchen with a wooden counter and pewter water basin. You see a door to the SOUTH.
+NULL|NULL|0|NULL
+#2
+bedroom
+A tiny room, with barely enough room to hold the pile of hay that is used as a bed. There is a door to NORTH and to the WEST
+3|NULL|NULL|0
+#3
+chamber room
+It doesn't smell too pleasant in here. The only door is to the SOUTH.
+NULL|NULL|2|NULL
+#4
+test room
+this is just a test room
+NULL|5|NULL|NULL
