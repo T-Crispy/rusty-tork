@@ -1,1 +1,0 @@
-C:\Repos\rusty-tork\tork\target\release\tork.exe: C:\Repos\rusty-tork\tork\src\builder.rs C:\Repos\rusty-tork\tork\src\driver.rs C:\Repos\rusty-tork\tork\src\main.rs C:\Repos\rusty-tork\tork\src\world\character.rs C:\Repos\rusty-tork\tork\src\world\room.rs C:\Repos\rusty-tork\tork\src\world.rs

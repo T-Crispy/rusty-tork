@@ -1,0 +1,41 @@
+(for Driver later on)
+Command Parsing:
+"{..}" - optional parameter for input
+"[..]" - required parameter for input
+[action] {article} [Direct Obj] {[preposition] + [article] + [Indirect Obj]} 
+
+ex.) "Attack  the    mailbox     with the elvish sword"
+    [action] [art] [direct obj] [preposition phrase]
+
+proto-command format:
+[action] [direct obj] {[preposition] [indirect obj]}
+
+proto-actions:
+-go/walk
+-take
+-drop
+-inv
+-attack
+-look
+-quit
+
+Actions:
+-brief: sets verbosity mode; only describes room the first time its entered
+-diagnose:
+    >diagnose
+    You have a light wound, which will be cured after 26 moves.
+    You can be killed by one more light wound.
+-inventory/inv/i:
+-look: gives a full description of your current location
+-examine [object]: gives description of object
+-quit: stops the game
+-restore: restores a previously saved position
+-restart: stops the game and starts it again from the beginning
+-save: saves a "snapshot" of your current position
+-wait: allows time to pass
+-(score): displays current score and rank
+    -full score: shows what you have done to earn your points
+-go/walk/move
+-take/pick up
+-drop
+-attack/hit/kill

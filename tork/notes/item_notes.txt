@@ -1,0 +1,16 @@
+Simple Items:
+-keys
+    >holds an unsigned index, unlocks any doors with the matching number
+-weapons
+    >dmg value
+    >hit chance
+-light source
+
+Types of items:
+-keys
+-weapons
+-consumables
+-containers
+-utility: to be used with events (switches, levers, etc.)
+-light source
+-{fixed/unfixed}
