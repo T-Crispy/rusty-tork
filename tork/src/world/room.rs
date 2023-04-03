@@ -7,52 +7,43 @@ pub enum Directions{
     West = 3,
 }
 
-//#[derive(Copy, Clone)]
+pub struct Doorway{
+    pub name: String,
+    pub article_phrase: String,
+    pub lock: isize,
+    pub path: *const Room,
+}
+
+impl Clone for Doorway{
+    fn clone(&self) -> Doorway {
+        let door_copy: Doorway = Doorway { 
+            name: self.name.clone(), 
+            article_phrase: self.article_phrase.clone(), 
+            lock: self.lock,
+            path: ptr::null_mut()
+        };
+        door_copy
+    }
+}
+
 pub struct Room{
     pub name: String,
     pub desc: String,
     pub id: usize,
-
-    //directions
-    //pub north: u32,
-    //pub east: u32,
-    //pub south: u32,
-    //pub west: u32,
-    pub pathways: [*const Room; 4],
-
+    pub pathways: [Doorway; 4],
 }
 
 impl Clone for Room{
     fn clone(&self) -> Room {
-        let room_copy: Room = Room{name: self.name.clone(), desc: self.desc.clone(), id: self.id, pathways: [ptr::null_mut(),ptr::null_mut(),ptr::null_mut(),ptr::null_mut()]};
+        let room_copy: Room = Room{
+                name: self.name.clone(), 
+                desc: self.desc.clone(), 
+                id: self.id,
+                pathways: [self.pathways[0].clone(), 
+                        self.pathways[1].clone(), 
+                        self.pathways[2].clone(), 
+                        self.pathways[3].clone()]
+            };
         room_copy
     }
 }
-
-/*
-pub struct NewsArticle {
-    pub headline: String,
-    pub location: String,
-    pub author: String,
-    pub content: String,
-}
-
-impl Summary for NewsArticle {
-    fn summarize(&self) -> String {
-        format!("{}, by {} ({})", self.headline, self.author, self.location)
-    }
-}
-
-pub struct Tweet {
-    pub username: String,
-    pub content: String,
-    pub reply: bool,
-    pub retweet: bool,
-}
-
-impl Summary for Tweet {
-    fn summarize(&self) -> String {
-        format!("{}: {}", self.username, self.content)
-    }
-}
-*/

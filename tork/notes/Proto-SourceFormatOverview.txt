@@ -1,5 +1,6 @@
 #world
 {Name of the world} + '\n'
+#rooms + '\n'
 [for each room]
     "#" + {room[i] id} + '\n'
     {room[i] name} + '\n'
@@ -10,3 +11,13 @@
         {id of room to S} + '|' +
         {id of room to W} + '|' + '\n'
         ("NULL" if that direction can't be traveled)
+    {LIT / DARK} + '\n'
+#items + '\n'
+[for each item]
+    '#' + {item[i] id} + '\n'
+    {item type} + '\n' (KEY / WPN / LIT)
+    {item name} + '\n'
+    {item value 1} + '|' + {item value 2}
+        (for keys: value 1 should match with whatever number lock is goes to)
+        (for lights: neither value is important)
+        (for wpns: value 1 is the dmg and value 2 is the hit chance)

@@ -1,10 +1,13 @@
-### Patch Notes: v0.1.2.2
+# Rusty Tork
 
-#### Changes
+## Patch Notes: v0.1.2.2
 
-- Room pathways are now defined with the rest of the room definition, instead of in a separate section
-- The number of rooms no longer needs to be defined, only the rooms themselves
-- Defining a pathway with an ID that does not have an associated room now provides a warning to the user
+### Changes
 
-#### Bug Fixes
-- (Deprecated)Defining less rooms than is declared no longer causes the program to crash
+- Rooms' pathways array of Room pointers have been replaced with an array of doorways, which contain a lock integer, a name, an article-phrase, and a pointer to a room.
+  - Proto-SourceFormatOverview.txt file has been updated
+- xx
+
+### Bug Fixes
+
+- xx

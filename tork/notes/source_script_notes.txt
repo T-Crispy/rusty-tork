@@ -1,0 +1,6 @@
+Things I need to decide on:
+-prefix char for section headers (like for rooms and items)
+-prefix char for subsections (like room name and desc)
+-postfix char for subsections
+-char for line breaks
+-char for splitting subsections (like with the pathways)
