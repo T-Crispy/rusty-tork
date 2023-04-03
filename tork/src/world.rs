@@ -1,5 +1,6 @@
 pub mod room;
 pub mod character;
+pub mod item;
 
 use room::Room;
 

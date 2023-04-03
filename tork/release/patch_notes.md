@@ -1,6 +1,6 @@
-# Rusty Tork
+# Patch Notes: (04/xx/23)
 
-## Patch Notes: v0.1.2.2
+## v0.1.2.2
 
 ### Changes
 

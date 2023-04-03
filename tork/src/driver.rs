@@ -87,7 +87,7 @@ pub fn run(w: &mut World) -> (&World, bool) {
 fn move_player(player: &mut Character, dir: Directions) -> bool {
     unsafe {
         //get the next room the player wants to go to
-        let next_room = (*player.loc).pathways[dir as usize];
+        let next_room = (*player.loc).pathways[dir as usize].path;
 
         //make sure that direction isn't NULL
         if next_room != ptr::null_mut() {

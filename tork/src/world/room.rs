@@ -8,8 +8,8 @@ pub enum Directions{
 }
 
 pub struct Doorway{
-    pub name: String,
-    pub article_phrase: String,
+    pub name: String, //simple noun for the "door"
+    pub pres_phrase: String, //presence phrase ex.) "there is a" or "there are"
     pub lock: isize,
     pub path: *const Room,
 }
@@ -18,7 +18,7 @@ impl Clone for Doorway{
     fn clone(&self) -> Doorway {
         let door_copy: Doorway = Doorway { 
             name: self.name.clone(), 
-            article_phrase: self.article_phrase.clone(), 
+            pres_phrase: self.pres_phrase.clone(), 
             lock: self.lock,
             path: ptr::null_mut()
         };
@@ -43,7 +43,7 @@ impl Clone for Room{
                         self.pathways[1].clone(), 
                         self.pathways[2].clone(), 
                         self.pathways[3].clone()]
-            };
+        };
         room_copy
     }
 }
