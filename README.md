@@ -1,6 +1,6 @@
 # Rusty Tork
 
-## Current Version: v0.1.2.2
+## Current Version: v0.2.3.0
 
 ### Project Description
 
@@ -32,17 +32,15 @@ I am using VS Code as my IDE for this project, so any further instructions will 
   - Extension ID: DavidAnson.vscode-markdownlint
   - Purpose: (optional) to help with writing the md files for patchnotes and such
 
-### Most Recent Patch Notes (as of xx/xx/xx)
-
-#### Changes
-
-- Room pathways are now defined with the rest of the room definition, instead of in a separate section
-- The number of rooms no longer needs to be defined, only the rooms themselves
-- Defining a pathway with an ID that does not have an associated room now provides a warning to the user
-
-#### Bug Fixes
-
-- (Deprecated)Defining less rooms than is declared no longer causes the program to crash
+> ### Most Recent Patch Notes (as of xx/xx/xx)
+>
+> #### Changes
+>
+> - xx
+>
+> #### Bug Fixes
+>
+> - xx
 
 ### Version Control
 
@@ -65,16 +63,17 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
 
 ### Phase Plan
 
-01. Simple Worlds
-    1. Get the Builder to be able build a world from a source file. For this phase, the rooms will only have NWSE directions.
-    2. Get the Driver to be able to play through a simple world, mostly just walking between rooms.
+01. ~~Simple Worlds~~
+    1. ~~Get the Builder to be able build a world from a source file. For this phase, the rooms will only have NWSE directions.~~
+    2. ~~Get the Driver to be able to play through a simple world, mostly just walking between rooms.~~
 02. Simple Items
     1. Add simple items the player can pick up, drop, and “use”. Each item will have a verb string for the player to invoke to use the item (“use” will always work)
-    2. Create item types: weapon, light source, keys
-    3. Update Rooms to have a “isLit” flag. If this flag is false, then the room is considered dark.
+    2. ~~Create item types: weapon, light source, keys~~
+    3. ~~Update Rooms to have a “isLit” flag. If this flag is false, then the room is considered dark.~~
     4. As a homage to Zork, if the player enters a dark room, the message “It is pitch black. You may are likely to be eaten by a grue”. If the player stays in the dark room, then the player will be eaten by said grue.
-    5. Add doors to the rooms that can be locked, requires the right key to go that direction.
-    6. Update Builder to be able to handle these additions
+    5. ~~Add doors to the rooms that can be locked, requires the right key to go that direction.~~
+    6. Update driver to check door locks
+    7. Update Builder to be able to handle these additions
 03. Simple Combat
     1. Add weapon items for combat
     2. Add Simple hostile NPCs

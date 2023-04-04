@@ -31,6 +31,7 @@ pub struct Room{
     pub desc: String,
     pub id: usize,
     pub pathways: [Doorway; 4],
+    pub dark: bool,
 }
 
 impl Clone for Room{
@@ -42,7 +43,8 @@ impl Clone for Room{
                 pathways: [self.pathways[0].clone(), 
                         self.pathways[1].clone(), 
                         self.pathways[2].clone(), 
-                        self.pathways[3].clone()]
+                        self.pathways[3].clone()],
+                dark: self.dark,
         };
         room_copy
     }

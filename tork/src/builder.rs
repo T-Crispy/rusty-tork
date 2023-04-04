@@ -9,14 +9,18 @@ use std::ptr;
 pub fn build_world(filename: String) -> (World, String) {
     let mut build_msg = String::from("");
  
-    let room_dec_lines: usize = 5;
+    let room_dec_lines: usize = 8;
     let num_paths: usize = 4;
+    let north_offset = 3;
+    let east_offset = 4;
+    let south_offset = 5;
+    let west_offset = 6;
 
     let item_dec_lines: usize = 4;
 
     let headers: Vec<&str> = vec!["#world","#rooms", "#items"];
 
-    let mut to_build = World{name: String::from("new world"), rooms: Vec::new()};
+    let mut to_build = World{name: String::from("new world"), rooms: Vec::new(), grue_enabled: false};
     
     //let mut finished = false;
     let contents = fs::read_to_string(filename)
@@ -130,11 +134,12 @@ pub fn build_world(filename: String) -> (World, String) {
             pathways: [ def_door.clone(), 
                         def_door.clone(), 
                         def_door.clone(),
-                        def_door.clone()]
+                        def_door.clone()],
+            dark: false
         };
         to_build.rooms = vec![null_room; num_rooms];
 
-        let mut paths_vec = vec![""; num_rooms];
+        let mut paths_vec = vec![vec!["";5]; num_rooms];
 
         //loop through the room lines to get the id,name, & desc of each room
         for i in 0..num_rooms{
@@ -144,7 +149,7 @@ pub fn build_world(filename: String) -> (World, String) {
             if rooms_vec[offset].starts_with('#') {
                 let id_parse_result = rooms_vec[offset].trim().trim_start_matches('#').parse::<usize>();
                 if id_parse_result.is_err() {
-                    let mut err_msg = String::from("err: Could not parse the ID number for room");
+                    let mut err_msg = String::from("err: Could not parse the ID number for room ");
                     err_msg.push_str(offset.to_string().as_str());
                     return (to_build, err_msg);
                 }
@@ -155,25 +160,50 @@ pub fn build_world(filename: String) -> (World, String) {
             to_build.rooms[i].name = rooms_vec[offset + 1].to_string();
             to_build.rooms[i].desc = rooms_vec[offset + 2].to_string();
 
+            //get the lit property
+            let lit_prop = rooms_vec[offset + 7].trim();
+            if lit_prop == "LIT"{
+                to_build.rooms[i].dark = false;
+            }
+            else if lit_prop == "DARK"{
+                to_build.rooms[i].dark = true;
+            }
+            else{
+                let mut err_msg = String::from("err: LIT property not correctly defined for room ");
+                err_msg.push_str(offset.to_string().as_str());
+                return (to_build, err_msg);
+            }
+
             //get room pathways
-            paths_vec[i] = rooms_vec[offset + 3].trim();
+            paths_vec[i][0] = rooms_vec[offset + north_offset].trim();
+            paths_vec[i][1] = rooms_vec[offset + east_offset].trim();
+            paths_vec[i][2] = rooms_vec[offset + south_offset].trim();
+            paths_vec[i][3] = rooms_vec[offset + west_offset].trim();
+
         }//end for i loop
 
         //loop through rooms to set pathways
         for i in 0..num_rooms{
-            let paths: Vec<&str> = paths_vec[i].split('|').collect();
-
-            //make sure 4 pathways were given
-            if paths.len() < num_paths{
-                let mut message = String::from("err: there are less than 4 paths in path set #");
-                message.push_str(i.to_string().as_str());
-                return (to_build, message);
-            }
 
             //set pathways for 
             for j in 0..num_paths{
-                if paths[j] != "NULL" {
-                    let num_id: usize = paths[j].trim().parse::<usize>().unwrap();
+                //       0   ,         1      ,     2    ,      3     ,    4
+                // ~direction, presence phrase, path name, lock number, path ID 
+                let door_vec: Vec<&str> = paths_vec[i][j].split('|').collect();
+
+                if door_vec.len() != 5{
+                    let mut err_msg = String::from("err: defined path way #");
+                    err_msg.push_str(j.to_string().as_str());
+                    err_msg.push_str(" for room #");
+                    err_msg.push_str(to_build.rooms[i].id.to_string().as_str());
+                    err_msg.push_str(" is not formatted correctly.");
+                    build_msg.push_str(err_msg.as_str());
+                }
+
+                if door_vec[4] != "NULL"{
+                    let num_id: usize = door_vec[4].trim().parse::<usize>().unwrap();
+                    
+                    //try to set path
                     let get_room_result: (usize, bool) = to_build.get_room_index(num_id);
                     if !get_room_result.1 {
                         let mut warn_msg = String::from("warn: a path way for room #");
@@ -183,11 +213,41 @@ pub fn build_world(filename: String) -> (World, String) {
                     }
                     else {
                         let room_id: usize = get_room_result.0;
-                    to_build.rooms[i].pathways[j].path = &mut to_build.rooms[room_id];
-                    }
+                        let dir_ind: usize;
+
+                        //get the pathway direction
+                        if door_vec[0].trim() == "~N" {
+                            dir_ind = 0;
+                        }
+                        else if door_vec[0].trim() == "~E" {
+                            dir_ind = 1;
+                        }
+                        else if door_vec[0].trim() == "~S" {
+                            dir_ind = 2;
+                        }
+                        else if door_vec[0].trim() == "~W" {
+                            dir_ind = 3;
+                        }
+                        else{
+                            dir_ind = 0;
+
+                            let mut err_msg = String::from("err: direction of defined path way #");
+                            err_msg.push_str(j.to_string().as_str());
+                            err_msg.push_str(" for room #");
+                            err_msg.push_str(to_build.rooms[i].id.to_string().as_str());
+                            err_msg.push_str(" is not valid. Must be N/E/S/W and prefixed by a \'~\'");
+                            build_msg.push_str(err_msg.as_str());
+                        }
+                        to_build.rooms[i].pathways[dir_ind].path = &mut to_build.rooms[room_id];
+
+                        //get other doorway stuff
+                        to_build.rooms[i].pathways[dir_ind].pres_phrase = door_vec[1].trim().to_string();
+                        to_build.rooms[i].pathways[dir_ind].name = door_vec[2].trim().to_string();
+                        to_build.rooms[i].pathways[dir_ind].lock = door_vec[3].trim().parse::<isize>().unwrap();
+                    }//end room ID check IF statement
                 }
             }//end for j loop
-        }
+        }//end for i loop
 
     }
     else {

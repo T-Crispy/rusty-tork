@@ -7,6 +7,7 @@ use room::Room;
 pub struct World{
     pub name: String,
     pub rooms: Vec<Room>,
+    pub grue_enabled: bool,
 }
 
 impl World{

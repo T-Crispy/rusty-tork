@@ -6,10 +6,11 @@
     {room[i] name} + '\n'
     {room[i] desc} + '\n'
     [paths]
-        {id of room to N} + '|' +
-        {id of room to E} + '|' +
-        {id of room to S} + '|' +
-        {id of room to W} + '|' + '\n'
+        '~' + [direction (N/E/S/W)] + '|' + 
+        {presence phrase} + '|' + 
+        {path name} + '|' + 
+        {lock number (0 is unlocked)} + '|' +
+        {id of room path leads to} + '\n'
         ("NULL" if that direction can't be traveled)
     {LIT / DARK} + '\n'
 #items + '\n'
