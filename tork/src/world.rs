@@ -3,10 +3,12 @@ pub mod character;
 pub mod item;
 
 use room::Room;
+use item::Item;
 
 pub struct World{
     pub name: String,
     pub rooms: Vec<Room>,
+    pub items: Vec<Item>,
     pub grue_enabled: bool,
 }
 

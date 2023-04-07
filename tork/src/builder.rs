@@ -1,4 +1,6 @@
 use crate::world::World;
+use crate::world::item::Item;
+use crate::world::item::ItemType;
 use crate::world::room::Doorway;
 use crate::world::room::Room;
 
@@ -20,7 +22,7 @@ pub fn build_world(filename: String) -> (World, String) {
 
     let headers: Vec<&str> = vec!["#world","#rooms", "#items"];
 
-    let mut to_build = World{name: String::from("new world"), rooms: Vec::new(), grue_enabled: false};
+    let mut to_build = World{name: String::from("new world"), rooms: Vec::new(), items: Vec::new(), grue_enabled: false};
     
     //let mut finished = false;
     let contents = fs::read_to_string(filename)
@@ -263,6 +265,64 @@ pub fn build_world(filename: String) -> (World, String) {
         
         //get number of items
         let num_items: usize = items_vec.len() / item_dec_lines;
+
+        //initialize to_build's items
+        let null_item: Item = Item{
+            item_type: ItemType::KEY,
+            id: 0,
+            name: String::from(""),
+            val1: 0,
+            val2: 0,
+        };
+        to_build.items = vec![null_item; num_items];
+
+        //loop through the item lines
+        for i in 0..num_items{
+            let offset: usize = i * item_dec_lines;
+
+            //get room ID
+            if items_vec[offset].starts_with('#') {
+                let id_parse_result = items_vec[offset].trim().trim_start_matches('#').parse::<usize>();
+                if id_parse_result.is_err(){
+                    let mut err_msg = String::from("err: Could not parse the ID number for item ");
+                    err_msg.push_str(offset.to_string().as_str());
+                    return (to_build, err_msg);
+                }
+                to_build.items[i].id = id_parse_result.unwrap();
+            }
+
+            let item_type = items_vec[offset + 1].trim();
+            if item_type == "WPN" {
+                to_build.items[i].item_type = ItemType::WPN;
+            }
+            else if item_type == "LIT" {
+                to_build.items[i].item_type = ItemType::LIT;
+            }
+
+            //get item name
+            to_build.items[i].name = items_vec[offset + 2].to_string();
+
+            let vals_vec: Vec<&str> = items_vec[offset + 3].split('|').collect();
+
+            if vals_vec.len() ==  2{
+                //get val1
+                let parse_result = vals_vec[0].trim().parse::<usize>();
+                if parse_result.is_err() {
+                    //flag return error message
+                }
+                to_build.items[i].val1 = parse_result.unwrap();
+
+                //get val 2
+                let parse_result = vals_vec[1].trim().parse::<usize>();
+                if parse_result.is_err() {
+                    //flag return error message
+                }
+                to_build.items[i].val2 = parse_result.unwrap();
+            }
+
+            
+        }
+
     }
     else {
         return (to_build, String::from("err: number of lines under #items header are off. Double check the item lines"));

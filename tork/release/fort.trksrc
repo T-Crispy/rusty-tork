@@ -7,7 +7,7 @@ You stand in the Front Courtyard of Fort Reeve.
 ~N | There is a | chained gate | 0 | NULL
 ~E | There is a | small building | 0 | 2
 ~S | The are | stables | 0 | 3
-~W | There is a | small building | 0 | 1
+~W | There is a | small building | 1 | 1
 LIT
 #1
 Armory
@@ -41,3 +41,8 @@ You're now in a Courtyard to the rear of the fort. There is a pair of double doo
 ~S | | | | NULL
 ~W | | | | NULL
 LIT
+#items
+#0
+KEY
+Armory key
+1 | 0
