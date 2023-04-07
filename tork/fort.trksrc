@@ -3,21 +3,46 @@ Fort Reeve
 #rooms
 #0
 Front Courtyard
-You stand in the Front Courtyard of Fort Reeve. The front gate to the NORTH seems to be stuck shut. There are two small buildings to the EAST and WEST and the stables to the SOUTH.
-NULL|2|3|1
+You stand in the Front Courtyard of Fort Reeve.
+~N | There is a | chained gate | 0 | NULL
+~E | There is a | small building | 0 | 2
+~S | The are | stables | 0 | 3
+~W | There is a | small building | 1 | 1
+LIT
 #1
 Armory
-You are now in the fort's armory. Weapon and armor racks line the walls, although all are bare. There is a door to the EAST.
-NULL|0|NULL|NULL
+You are now in the fort's armory. Weapon and armor racks line the walls, although all are bare.
+~N | | | | NULL
+~E | There is a | door | 0 | 0
+~S | | | | NULL
+~W | | | | NULL
+LIT
 #2
 Barracks
-You are in the fort's barracks. The room is filled with cots and footlockers, with just enough space between them for someone to walk through. The cots look as if their owners left in a hurry. There is a door to the WEST
-NULL|NULL|NULL|0
+You are in the fort's barracks. The room is filled with cots and footlockers, with just enough space between them for someone to walk through. The cots look as if their owners left in a hurry.
+~N | | | | NULL
+~E | | | | NULL
+~S | | | | NULL
+~W | There is a | door | 0 | 0
+LIT
 #3
 Stables
 You are standing in the fort's stables. Each stall has a skeleton of a horse in it that appears to be scorched.
-0|NULL|4|NULL
+~N | There is a | Courtyard | 0 | 0
+~E | | | | NULL
+~S | | | | 4
+~W | There is a | Courtyard | 0 | NULL
+LIT
 #4
 Back Courtyard
 You're now in a Courtyard to the rear of the fort. There is a pair of double doors that are chained up to the SOUTH. The stables lie to the NORTH of you.
-3|NULL|NULL|NULL
+~N | | | 0 | 3
+~E | | | | NULL
+~S | | | | NULL
+~W | | | | NULL
+LIT
+#items
+#0
+KEY
+Armory key
+1 | 0
