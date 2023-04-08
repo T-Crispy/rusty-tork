@@ -12,6 +12,7 @@ pub struct Item {
     pub id: usize,
     pub val1: usize,
     pub val2: usize,
+    pub loc: isize,
 }
 
 impl Clone for Item{
@@ -21,7 +22,8 @@ impl Clone for Item{
             id: self.id,
             item_type: ItemType::KEY,
             val1: self.val1, 
-            val2: self.val2 
+            val2: self.val2,
+            loc: self.loc,
         };
 
         if self.item_type == ItemType::LIT{

@@ -73,7 +73,7 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
     4. As a homage to Zork, if the player enters a dark room, the message “It is pitch black. You may are likely to be eaten by a grue”. If the player stays in the dark room, then the player will be eaten by said grue.
     5. ~~Add doors to the rooms that can be locked, requires the right key to go that direction.~~
     6. Update driver to check door locks
-    7. Update Builder to be able to handle these additions
+    7. ~~Update Builder to be able to handle these additions~~
 03. Simple Combat
     1. Add weapon items for combat
     2. Add Simple hostile NPCs

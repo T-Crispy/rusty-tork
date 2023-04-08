@@ -1,5 +1,6 @@
 #world
 Fort Reeve
+GRUE
 #rooms
 #0
 Front Courtyard
@@ -30,7 +31,7 @@ Stables
 You are standing in the fort's stables. Each stall has a skeleton of a horse in it that appears to be scorched.
 ~N | There is a | Courtyard | 0 | 0
 ~E | | | | NULL
-~S | | | | 4
+~S | | | | NULL
 ~W | There is a | Courtyard | 0 | NULL
 LIT
 #4
@@ -44,5 +45,6 @@ LIT
 #items
 #0
 KEY
+~loc 2
 Armory key
 1 | 0

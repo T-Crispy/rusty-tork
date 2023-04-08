@@ -11,6 +11,8 @@ use std::ptr;
 pub fn build_world(filename: String) -> (World, String) {
     let mut build_msg = String::from("");
  
+    let world_dec_lines: usize = 2;
+
     let room_dec_lines: usize = 8;
     let num_paths: usize = 4;
     let north_offset = 3;
@@ -18,7 +20,7 @@ pub fn build_world(filename: String) -> (World, String) {
     let south_offset = 5;
     let west_offset = 6;
 
-    let item_dec_lines: usize = 4;
+    let item_dec_lines: usize = 5;
 
     let headers: Vec<&str> = vec!["#world","#rooms", "#items"];
 
@@ -31,6 +33,7 @@ pub fn build_world(filename: String) -> (World, String) {
     let lines: Vec<&str> = contents.split("\r\n").collect();
 
     let mut world_ind: isize = -1;
+    let mut world_end: usize = 0;
 
     let mut rooms_ind: isize = -1;
     let mut rooms_end: usize = 0;
@@ -49,18 +52,20 @@ pub fn build_world(filename: String) -> (World, String) {
         if curr_line == "#world" {
             world_ind = i as isize;
 
-            if i < lines.len() - 1 {
-                curr_line = lines[i + 1];
+            i += 1;
+            curr_line = lines[i];
 
-                if curr_line.chars().nth(0).unwrap() == '#' {
-                    return (to_build, String::from("err: World name is missing"));
-                }
-                else{
-                    to_build.name = lines[(world_ind + 1) as usize].to_string();
-                }
+            while !(headers.contains(&curr_line)) && i < lines.len(){
+                curr_line = lines[i];
+                i += 1;
             }
 
-            i += 1;
+            if i != lines.len() {
+                i -= 1;
+            }
+            
+            world_end = i;
+            i -= 1;
         }
         else if curr_line == "#rooms" {
             rooms_ind = i as isize;
@@ -70,11 +75,15 @@ pub fn build_world(filename: String) -> (World, String) {
 
             while !(headers.contains(&curr_line)) && i < lines.len(){
                 //continue iterating until the next header is reached or the end of line
+                curr_line = lines[i];
                 i += 1;
             }
 
-            i -= 1;
+            if i != lines.len() {
+                i -= 1;
+            }
             rooms_end = i;
+            i -= 1;
         }
         else if curr_line == "#items" {
             items_ind = i as isize;
@@ -84,11 +93,15 @@ pub fn build_world(filename: String) -> (World, String) {
 
             while !(headers.contains(&curr_line)) && i < lines.len() {
                 //continue iterating until the next header
+                curr_line = lines[i];
                 i += 1;
             }
 
-            i -= 1;
+            if i != lines.len() {
+                i -= 1;
+            }
             items_end = i;
+            i -= 1;
         }
         i += 1;
     } //end header check
@@ -103,13 +116,39 @@ pub fn build_world(filename: String) -> (World, String) {
         return (to_build, String::from("err: #items header missing"));
     }
 
+    
+    let world_ind: usize = world_ind as usize;
+    let num_world_lines: usize = world_end - world_ind - 1;
+    let mut world_vec = vec![""; num_world_lines];
+
     let rooms_ind: usize = rooms_ind as usize;
-    let num_rooms: usize = rooms_end - rooms_ind;
+    let num_rooms: usize = rooms_end - rooms_ind - 1;
     let mut rooms_vec = vec![""; num_rooms];
 
     let items_ind: usize = items_ind as usize;
-    let num_items: usize = items_end - items_ind;
+    let num_items: usize = items_end - items_ind - 1;
     let mut items_vec = vec![""; num_items];
+
+    //~~~~~~~fecthing world info~~~~~~~~~
+    if num_world_lines % world_dec_lines == 0 {
+        //get subarr of lines under the world header
+        let left_ind = world_ind + 1;
+        let right_ind: usize = world_end;
+
+        world_vec.clone_from_slice(&lines[left_ind..right_ind]);
+
+        to_build.name = world_vec[0].to_string();
+        
+        if world_vec[1] == "GRUE" {
+            to_build.grue_enabled = true;
+        }
+        else if world_vec[1] == "NO GRUE" {
+            to_build.grue_enabled = false;
+        }
+        else {
+            //flag add in error message
+        }
+    }
 
     //~~~~~~~fecthing room info~~~~~~~~~
     //make sure the # of lines between the headers = 3r + 1
@@ -118,7 +157,7 @@ pub fn build_world(filename: String) -> (World, String) {
         //get the sub_arr for the room and path stuff
         let left_ind = rooms_ind+1;
         let right_ind = rooms_end;
-        rooms_vec.clone_from_slice(&lines[left_ind..right_ind+1]);
+        rooms_vec.clone_from_slice(&lines[left_ind..right_ind]);
 
         //get number of rooms
         let num_rooms: usize = rooms_vec.len() / room_dec_lines;
@@ -202,8 +241,9 @@ pub fn build_world(filename: String) -> (World, String) {
                     build_msg.push_str(err_msg.as_str());
                 }
 
-                if door_vec[4] != "NULL"{
-                    let num_id: usize = door_vec[4].trim().parse::<usize>().unwrap();
+                let destination = door_vec[4].trim();
+                if destination != "NULL"{
+                    let num_id: usize = destination.parse::<usize>().unwrap();
                     
                     //try to set path
                     let get_room_result: (usize, bool) = to_build.get_room_index(num_id);
@@ -261,7 +301,7 @@ pub fn build_world(filename: String) -> (World, String) {
         //get the sub_arr for the item stuff
         let left_ind = items_ind + 1;
         let right_ind = items_end;
-        items_vec.clone_from_slice(&lines[left_ind..right_ind + 1]);
+        items_vec.clone_from_slice(&lines[left_ind..right_ind]);
         
         //get number of items
         let num_items: usize = items_vec.len() / item_dec_lines;
@@ -273,6 +313,7 @@ pub fn build_world(filename: String) -> (World, String) {
             name: String::from(""),
             val1: 0,
             val2: 0,
+            loc: -1,
         };
         to_build.items = vec![null_item; num_items];
 
@@ -299,10 +340,24 @@ pub fn build_world(filename: String) -> (World, String) {
                 to_build.items[i].item_type = ItemType::LIT;
             }
 
-            //get item name
-            to_build.items[i].name = items_vec[offset + 2].to_string();
+            //get the items starting location
+            if items_vec[offset + 2].starts_with("~loc") {
+                let id_parse_result = items_vec[offset + 2].trim_start_matches("~loc").trim().trim_start_matches("~loc").parse::<isize>();
+                if id_parse_result.is_err(){
+                    let mut err_msg = String::from("err: Could not parse the Room ID number for item ");
+                    err_msg.push_str(offset.to_string().as_str());
+                    return (to_build, err_msg);
+                }
+                to_build.items[i].loc = id_parse_result.unwrap();
+            }
+            else{
+                //flag add in error message
+            }
 
-            let vals_vec: Vec<&str> = items_vec[offset + 3].split('|').collect();
+            //get item name
+            to_build.items[i].name = items_vec[offset + 3].to_string();
+
+            let vals_vec: Vec<&str> = items_vec[offset + 4].split('|').collect();
 
             if vals_vec.len() ==  2{
                 //get val1
@@ -319,7 +374,6 @@ pub fn build_world(filename: String) -> (World, String) {
                 }
                 to_build.items[i].val2 = parse_result.unwrap();
             }
-
             
         }
 
