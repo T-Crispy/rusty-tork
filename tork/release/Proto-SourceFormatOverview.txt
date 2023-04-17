@@ -1,5 +1,6 @@
 #world
 {Name of the world} + '\n'
+{Grue flag} (GRUE/NO GRUE) + '\n'
 #rooms + '\n'
 [for each room]
     "#" + {room[i] id} + '\n'
@@ -17,6 +18,7 @@
 [for each item]
     '#' + {item[i] id} + '\n'
     {item type} + '\n' (KEY / WPN / LIT)
+    "~loc " + {room id of location} + '\n' (-1 if the item starts in the players inventory)
     {item name} + '\n'
     {item value 1} + '|' + {item value 2}
         (for keys: value 1 should match with whatever number lock is goes to)

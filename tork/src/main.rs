@@ -22,7 +22,9 @@ ___make driver capable of playing through a world
 fn main() {
     let dir: PathBuf = env::current_dir().unwrap();
     let mut running: bool = true;
-    
+    let ver = "v0.2.7.0";
+
+    println!("Welcome to Tork {}!", ver);
  
     while running{
         let mut file_name = String::new();

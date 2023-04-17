@@ -10,7 +10,7 @@ pub enum Directions{
 pub struct Doorway{
     pub name: String, //simple noun for the "door"
     pub pres_phrase: String, //presence phrase ex.) "there is a" or "there are"
-    pub lock: isize,
+    pub lock: usize,
     pub path: *const Room,
 }
 
@@ -33,6 +33,40 @@ pub struct Room{
     pub pathways: [Doorway; 4],
     pub dark: bool,
     pub floor: [isize; 7], //ids of items on floor (-1 for empty slot)
+}
+
+impl Room{
+    pub fn catch_item(&mut self, item_id: usize) -> bool {
+        for (i, item) in self.floor.iter().enumerate() {
+            if item.eq(&-1) {
+                let mut id = item_id.clone() as isize;
+                let _ = &self.floor[i].clone_into(&mut id);
+                return true;
+            }
+        }
+        //no room on floor
+        false
+    }
+
+    pub fn handoff_item(&mut self, item_id: usize) -> bool {
+        for (i, item) in self.floor.iter().enumerate() {
+            //compare Item IDs
+            if item.eq(&(item_id as isize)) {
+                self.floor[i] = -1;
+                return true;
+            }
+        }
+        return false
+    }
+
+    pub fn floor_full(&self) -> bool {
+        for item in self.floor.iter() {
+            if item.eq(&-1) {
+                return false;
+            }
+        }
+        return true
+    }
 }
 
 impl Clone for Room{

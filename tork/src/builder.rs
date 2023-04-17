@@ -286,7 +286,7 @@ pub fn build_world(filename: String) -> (World, String) {
                         //get other doorway stuff
                         to_build.rooms[i].pathways[dir_ind].pres_phrase = door_vec[1].trim().to_string();
                         to_build.rooms[i].pathways[dir_ind].name = door_vec[2].trim().to_string();
-                        to_build.rooms[i].pathways[dir_ind].lock = door_vec[3].trim().parse::<isize>().unwrap();
+                        to_build.rooms[i].pathways[dir_ind].lock = door_vec[3].trim().parse::<usize>().unwrap();
                     }//end room ID check IF statement
                 }
             }//end for j loop
