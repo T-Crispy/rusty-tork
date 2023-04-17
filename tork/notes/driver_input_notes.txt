@@ -1,4 +1,11 @@
 (for Driver later on)
+
+Order of Processing:
+- Announce Room
+- Take Player input
+    > execute action
+- NPC action
+
 Command Parsing:
 "{..}" - optional parameter for input
 "[..]" - required parameter for input

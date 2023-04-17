@@ -176,7 +176,8 @@ pub fn build_world(filename: String) -> (World, String) {
                         def_door.clone(), 
                         def_door.clone(),
                         def_door.clone()],
-            dark: false
+            dark: false,
+            floor: [0;7]
         };
         to_build.rooms = vec![null_room; num_rooms];
 

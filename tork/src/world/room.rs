@@ -32,6 +32,7 @@ pub struct Room{
     pub id: usize,
     pub pathways: [Doorway; 4],
     pub dark: bool,
+    pub floor: [isize; 7], //ids of items on floor (-1 for empty slot)
 }
 
 impl Clone for Room{
@@ -45,6 +46,7 @@ impl Clone for Room{
                         self.pathways[2].clone(), 
                         self.pathways[3].clone()],
                 dark: self.dark,
+                floor: self.floor.clone(),
         };
         room_copy
     }

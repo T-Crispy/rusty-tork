@@ -12,7 +12,7 @@ pub struct Item {
     pub id: usize,
     pub val1: usize,
     pub val2: usize,
-    pub loc: isize,
+    pub loc: isize, //-1 means item is on player, positive values for rooms
 }
 
 impl Clone for Item{

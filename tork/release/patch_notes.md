@@ -4,7 +4,7 @@
 
 ### Changes
 
-- Simple items the player can pick up, drop, and “use”. Each item will have a verb string for the player to invoke to use the item (“use” will always work)
+- Simple items the player can "take" and "drop"
   - ~~Simple Items consist of the following Item Types: weapons, light sources, keys~~
 - The player can now use the actions "take" and "drop" for items
   - The player now has an inventory to hold items, with a limit of 7 items

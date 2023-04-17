@@ -67,7 +67,7 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
     1. ~~Get the Builder to be able build a world from a source file. For this phase, the rooms will only have NWSE directions.~~
     2. ~~Get the Driver to be able to play through a simple world, mostly just walking between rooms.~~
 02. Simple Items
-    1. Add simple items the player can pick up, drop, and “use”. Each item will have a verb string for the player to invoke to use the item (“use” will always work)
+    1. Add simple items the player can "take" and "drop"
     2. ~~Create item types: weapon, light source, keys~~
     3. ~~Update Rooms to have a “isLit” flag. If this flag is false, then the room is considered dark.~~
     4. As a homage to Zork, if the player enters a dark room, the message “It is pitch black. You may are likely to be eaten by a grue”. If the player stays in the dark room, then the player will be eaten by said grue.
@@ -79,15 +79,15 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
     2. Add Simple hostile NPCs
     3. Update the Builder to be able to build NPCs and weapon items
     4. Update the Driver to be able to handle simple combat where the player and NPC take turns trying to attack each other until one dies.
-04. Build Menu
-    1. Add the Build Menu to the Builder that steps the user through making their world.
+04. World Saves
+    1. Get the Driver to be able to save the state of the world to a file separate from the original source file.
+    2. Update the builder to take in a save file (should be a small update)
 05. Simple Events
     1. Get the Event Handler to handle simple triggers: turn count, bringing item into a room, event trigger count, item used, player death.
     2. Get the Event Handler to handle simple actions: display a message, change a pathway of a room, move item, (un)lock a door.
     3. Update the Builder for users to add events.
-06. World Saves
-    1. Get the Driver to be able to save the state of the world to a file separate from the original source file.
-    2. Update the builder to take in a save file (should be a small update)
+06. Build Menu
+    1. Add the Build Menu to the Builder that steps the user through making their world.
 07. Beta Testing
     1. Have users test the program for any bugs and get feedback for possible changes.
 08. Complex Worlds & Items
