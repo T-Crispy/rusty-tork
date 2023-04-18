@@ -1,6 +1,6 @@
 # Rusty Tork
 
-## Current Stable Version: v0.2.7.1
+## Current Stable Version: v0.3.0.0
 
 ### Project Description
 
