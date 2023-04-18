@@ -1,5 +1,5 @@
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum ItemType{
     KEY = 0,
     LIT = 1,
@@ -14,6 +14,7 @@ pub struct Item {
     pub val2: usize,
     pub loc: isize, //-1 means item is on player, positive values for rooms
 }
+
 
 impl Clone for Item{
     fn clone(&self) -> Item {

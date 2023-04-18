@@ -4,7 +4,8 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 
-use crate::world::World;
+use crate::world::{World, room};
+use crate::world::character::Character;
 
 pub mod builder;
 pub mod driver;
@@ -56,8 +57,35 @@ fn main() {
                 }
 
                 let mut built_world = result.0;
-                println!("Starting {}...",built_world.name);
-                let result: (&World, bool) = driver::run(&mut built_world);
+                let mut player: Character = Character {loc: &built_world.rooms[0], inv_lim: 7, inv: [-1;7]};
+                //initialize item locations
+                for item in built_world.items.iter() {
+                    if item.loc.eq(&-1){
+                        //add to player inventory
+                        if !player.pocket_item(item.id) {
+                            if built_world.rooms[0].catch_item(item.id) {
+                                println!("warn: more than 7 items have been declared to start in the player's inventory. Placing overlfow item into first room.");
+                            }
+                            else {
+                                println!("warn: too many overflow items for player inventory; item #{} will be living in the void", item.id);
+                            }
+                        }
+                    }
+                    else if item.loc.is_positive() {
+                        //add the item to its room floor
+                        
+                        //get the room index
+                        let room_ind = built_world.get_room_index(item.loc as usize).0;
+                        let curr_room = &mut built_world.rooms[room_ind];
+
+                        if !curr_room.catch_item(item.id) {
+                            println!("warn: No space in room #{} for item #{}",curr_room.id, item.id);
+                        }
+                    }
+                }
+
+                println!("Starting {}...", &built_world.name);
+                let result: (&World, bool) = driver::run(&mut built_world, &mut player);
                 if !result.1 {
                     print!("An Error was encountered while running the world");
                 }

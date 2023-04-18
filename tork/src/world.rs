@@ -62,7 +62,7 @@ impl World{
 
     pub fn fetch_item_id(&self, name: &String) -> (usize, bool){
         for item in self.items.iter(){
-            if item.name.eq(name){
+            if item.name.to_ascii_lowercase().eq(name){
                 return (item.id, true);
             }
         }
@@ -70,3 +70,17 @@ impl World{
         (0, false)
     }
 }
+
+/*
+impl Clone for World {
+    fn clone(&self) -> World {
+        let mut world_clone: World = World {
+            name: self.name.clone(),
+            rooms: self.rooms.clone(),
+            items: self.items.clone(),
+            grue_enabled: self.grue_enabled,
+        };
+
+        world_clone
+    }
+}*/

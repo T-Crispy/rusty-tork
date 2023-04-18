@@ -19,10 +19,9 @@ pub enum Actions{
     Look,
 }
 
-pub fn run(w: &mut World) -> (&World, bool) {
+pub fn run<'a>(w: &'a mut World, player: &'a mut Character) -> (&'a World, bool) {
     //initialize input and player
     let mut input = String::new();
-    let mut player: Character = Character {loc: &w.rooms[0], inv_lim: 7, inv: [-2;7]};
     let mut in_dark: bool = false;
 
     while input != "quit" {
@@ -81,7 +80,7 @@ pub fn run(w: &mut World) -> (&World, bool) {
 
                     //move player
                     if valid_dir {
-                        let result = move_player(&mut player, &w, go);
+                        let result = move_player(player, &w, go);
                         if !result.0 {
                             println!("{}",result.1);
                         }
@@ -98,7 +97,10 @@ pub fn run(w: &mut World) -> (&World, bool) {
                 //search for item id by name
                 let result = w.fetch_item_id(&rem_text);
                 if result.1 == true {
-                    take_item(&mut player, w, result.0);
+                    let result = take_item(player, w, result.0);
+                    if !result.0{
+                        println!("{}",result.1);
+                    }
                 }
                 else {
                     println!("You cannot take \"{}\"", rem_text);
@@ -110,7 +112,7 @@ pub fn run(w: &mut World) -> (&World, bool) {
                 //search for item id by name
                 let result = w.fetch_item_id(&rem_text);
                 if result.1 == true {
-                    let result = drop_item(&mut player, w, result.0);
+                    let result = drop_item(player, w, result.0);
                     if !result.0 {
                         println!("{}",result.1);
                     }
@@ -148,6 +150,9 @@ pub fn run(w: &mut World) -> (&World, bool) {
 
         //~~~NPC Action~~~
         //flag to add
+
+        //empty line so the turns are easier to make out
+        println!("");
     }
 
     (w, false)
@@ -160,7 +165,7 @@ fn has_key(p: &Character, w: &World, lock: usize) -> bool {
 
     for item in (*p).inv.iter() {
         //check if there is an item in the inv slot
-        if item.eq(&-1) {
+        if !item.eq(&-1) {
             //get the index for that item in the World's Item arr
             let item_ind = (*w).get_item_index((*item) as usize).0;
             let world_item = &(*w).items[item_ind];
@@ -175,7 +180,7 @@ fn has_key(p: &Character, w: &World, lock: usize) -> bool {
     return false
 }
 
-fn holding_light(p: &Character, w: &World) -> bool {
+pub fn holding_light(p: &Character, w: &World) -> bool {
     //loop through player inv
     for item in (*p).inv.iter() {
         //check if inv slot is not empty
@@ -190,7 +195,7 @@ fn holding_light(p: &Character, w: &World) -> bool {
     false
 }
 
-fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         //get item's index of world vector
         let world_ind: usize = w.get_item_index(item_id).0;
@@ -206,6 +211,7 @@ fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String)
                 //remove item from floor
                 if curr_room.handoff_item(item_id) {
                     (*w).items[world_ind].loc = -1;
+                    return (true, String::new());
                 }
             }
             else {
@@ -220,7 +226,7 @@ fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String)
     return (false, String::from("err: unexpected error in take_item()"))
 }
 
-fn drop_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn drop_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         let world_ind: usize;
         let play_ind: usize;
@@ -258,7 +264,7 @@ fn drop_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String)
     (false, String::from("There is not enough space on the floor."))
 }
 
-fn parse_action(input: &str) -> Actions {
+pub fn parse_action(input: &str) -> Actions {
     let action: Actions;
 
     match input {
@@ -276,7 +282,7 @@ fn parse_action(input: &str) -> Actions {
 }
 
 //returning true = player in darkness
-fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
+pub fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
     let room_name = &curr_room.name;
     let room_desc = &curr_room.desc;
 
@@ -290,17 +296,17 @@ fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
         let door_name = &curr_room.pathways[0].name; 
         println!("{} {} to the North",pres_phrase, door_name);
     }
-    else if (*curr_room).pathways[1].path != ptr::null_mut() {
+    if (*curr_room).pathways[1].path != ptr::null_mut() {
         let pres_phrase = &curr_room.pathways[1].pres_phrase;
         let door_name = &curr_room.pathways[1].name; 
         println!("{} {} to the East",pres_phrase, door_name);
     }
-    else if (*curr_room).pathways[2].path != ptr::null_mut() {
+    if (*curr_room).pathways[2].path != ptr::null_mut() {
         let pres_phrase = &curr_room.pathways[2].pres_phrase;
         let door_name = &curr_room.pathways[2].name; 
         println!("{} {} to the South",pres_phrase, door_name);
     }
-    else if (*curr_room).pathways[3].path != ptr::null_mut() {
+    if (*curr_room).pathways[3].path != ptr::null_mut() {
         let pres_phrase = &curr_room.pathways[3].pres_phrase;
         let door_name = &curr_room.pathways[3].name; 
         println!("{} {} to the West",pres_phrase, door_name);
@@ -333,7 +339,7 @@ fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
     return false
 }
 
-fn move_player(player: &mut Character, w: &World, dir: Directions) -> (bool, String) {
+pub fn move_player(player: &mut Character, w: &World, dir: Directions) -> (bool, String) {
     unsafe {
         //get the next room the player wants to go to
         let next_door = &(*player.loc).pathways[dir as usize];

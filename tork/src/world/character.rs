@@ -21,7 +21,7 @@ impl  Character {
           let mut count = 0;
 
           for item in self.inv.iter() {
-               if item.eq(&-1) {
+               if !item.eq(&-1) {
                     count += 1;
                }
           }
@@ -31,7 +31,7 @@ impl  Character {
      pub fn pocket_item(&mut self, item_id: usize) -> bool {
           for(i, item) in self.inv.iter().enumerate() {
                //check for empty slot
-               if !item.eq(&-1) {
+               if item.eq(&-1) {
                     self.inv[i] = item_id as isize;
                     return true;
                }

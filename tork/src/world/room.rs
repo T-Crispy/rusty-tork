@@ -39,8 +39,8 @@ impl Room{
     pub fn catch_item(&mut self, item_id: usize) -> bool {
         for (i, item) in self.floor.iter().enumerate() {
             if item.eq(&-1) {
-                let mut id = item_id.clone() as isize;
-                let _ = &self.floor[i].clone_into(&mut id);
+                let id = item_id.clone() as isize;
+                let _ = &self.floor[i].clone_from(&id);
                 return true;
             }
         }
