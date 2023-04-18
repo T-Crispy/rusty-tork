@@ -31,20 +31,46 @@ Stables
 You are standing in the fort's stables. Each stall has a skeleton of a horse in it that appears to be scorched.
 ~N | There is a | Courtyard | 0 | 0
 ~E | | | | NULL
-~S | | | | NULL
-~W | There is a | Courtyard | 0 | NULL
+~S | There is a | Courtyard | 0 | 4
+~W | | | | NULL
 LIT
 #4
 Back Courtyard
-You're now in a Courtyard to the rear of the fort. There is a pair of double doors that are chained up to the SOUTH. The stables lie to the NORTH of you.
-~N | | | 0 | 3
+You're now in a Courtyard to the rear of the fort.
+~N | There are | Stables | 0 | 3
 ~E | | | | NULL
-~S | | | | NULL
+~S | There are | Double Doors | 20 | 5
 ~W | | | | NULL
 LIT
+#5
+Fort Foyer
+You are standing in the Foyer of Fort Reeve. The stone floors and walls still
+~N | There are | Stairs | 0 | 4
+~E | | | 0 | NULL
+~S | There is a | Hallway | 0 | 6
+~W | | | 0 | NULL
+DARK
+#6
+Hallway Intersection
+You are at an Intersection of two hallways. Rubble and Debris blocks the pathways to the East, South, and West.
+~N | There is a | Hallway | 0 | 5
+~E | There's | rubble | 0 | NULL
+~S | You see | debris | 0 | NULL
+~W | | | 0| NULL
+DARK
 #items
 #0
 KEY
 ~loc 2
 Armory key
 1 | 0
+#1
+KEY
+~loc 1
+Fort key
+20 | 0
+#2
+LIT
+~loc 4
+Torch
+5 | 0

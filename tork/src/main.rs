@@ -4,21 +4,12 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 
-use crate::world::{World, room};
+use crate::world::World;
 use crate::world::character::Character;
 
 pub mod builder;
 pub mod driver;
 pub mod world;
-
-/*
-___make builder capable to build source file
-    >rooms will only have NESW directions
-___make driver capable of playing through a world
-    >just walking between rooms and outputing the name & desc of the room
-*/
-
-//Defining less rooms than is declared "causes the program to immediately crash"
 
 fn main() {
     let dir: PathBuf = env::current_dir().unwrap();
@@ -84,7 +75,7 @@ fn main() {
                     }
                 }
 
-                println!("Starting {}...", &built_world.name);
+                println!("Starting {}...\n", &built_world.name);
                 let result: (&World, bool) = driver::run(&mut built_world, &mut player);
                 if !result.1 {
                     print!("An Error was encountered while running the world");
