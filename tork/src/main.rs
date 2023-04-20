@@ -5,11 +5,13 @@ use std::path::PathBuf;
 use std::fs::OpenOptions;
 
 use crate::world::World;
-use crate::world::character::Character;
+use crate::world::player::Player;
 
 pub mod builder;
 pub mod driver;
 pub mod world;
+
+//flag go back and change all the tuple returning functions to use the Option type instead
 
 fn main() {
     let dir: PathBuf = env::current_dir().unwrap();
@@ -48,7 +50,7 @@ fn main() {
                 }
 
                 let mut built_world = result.0;
-                let mut player: Character = Character {loc: &built_world.rooms[0], inv_lim: 7, inv: [-1;7]};
+                let mut player: Player = Player {loc: &built_world.rooms[0], inv_lim: 7, inv: [-1;7], hit_points: 100};
                 //initialize item locations
                 for item in built_world.items.iter() {
                     if item.loc.eq(&-1){

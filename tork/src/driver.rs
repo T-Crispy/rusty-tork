@@ -6,7 +6,7 @@ use crate::world::World;
 use crate::world::item::{Item, ItemType};
 use crate::world::room::{Directions};
 use crate::world::room::Room;
-use crate::world::character::Character;
+use crate::world::player::Player;
 
 pub enum Actions{
     Nvld, //invalid
@@ -19,7 +19,7 @@ pub enum Actions{
     Look,
 }
 
-pub fn run<'a>(w: &'a mut World, player: &'a mut Character) -> (&'a World, bool) {
+pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
     //initialize input and player
     let mut input = String::new();
     let mut in_dark: bool = false;
@@ -158,7 +158,7 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Character) -> (&'a World, bool)
     (w, false)
 }
 
-fn has_key(p: &Character, w: &World, lock: usize) -> bool {
+fn has_key(p: &Player, w: &World, lock: usize) -> bool {
     if lock == 0{
         return true;    
     }
@@ -180,7 +180,7 @@ fn has_key(p: &Character, w: &World, lock: usize) -> bool {
     return false
 }
 
-pub fn holding_light(p: &Character, w: &World) -> bool {
+pub fn holding_light(p: &Player, w: &World) -> bool {
     //loop through player inv
     for item in (*p).inv.iter() {
         //check if inv slot is not empty
@@ -195,7 +195,7 @@ pub fn holding_light(p: &Character, w: &World) -> bool {
     false
 }
 
-pub fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn take_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         //get item's index of world vector
         let world_ind: usize = w.get_item_index(item_id).0;
@@ -226,7 +226,7 @@ pub fn take_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, Str
     return (false, String::from("err: unexpected error in take_item()"))
 }
 
-pub fn drop_item(p: &mut Character, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn drop_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         let world_ind: usize;
         let play_ind: usize;
@@ -339,7 +339,7 @@ pub fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
     return false
 }
 
-pub fn move_player(player: &mut Character, w: &World, dir: Directions) -> (bool, String) {
+pub fn move_player(player: &mut Player, w: &World, dir: Directions) -> (bool, String) {
     unsafe {
         //get the next room the player wants to go to
         let next_door = &(*player.loc).pathways[dir as usize];
