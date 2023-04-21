@@ -30,6 +30,6 @@
     '#' + {npc[i] id} + '\n'
     "~loc " + {room id of location} + '\n'
     {npc name} + '\n'
-    {npc hit points} + '\n'
-    {npc attack dmg} + '\n'
+    {npc hit points} + '\n' (max is 65,535)
+    {npc attack dmg} + '\n' (max is 65,535)
     {npc hit chance} + '\n' (unit is 0.01%; so 12.5% chance to hit would be "1250")

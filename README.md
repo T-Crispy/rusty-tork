@@ -1,6 +1,6 @@
 # Rusty Tork
 
-## Current Stable Version: v0.3.0.0
+## Current Stable Version: v0.3.4.0
 
 ### Project Description
 
@@ -9,15 +9,17 @@ Interactive Fictions (IFs) are text based games that allow a player to type an i
 One IF that gained quite a bit of popularity at one point is the Zork series.
 The aim of Tork will be to allow users to create their own “Zork” game.
 
-### Getting Started - Compiling project files
+***
 
-#### Installing Rust
+## Getting Started - Compiling project files
+
+### Installing Rust
 
 For compiling the project files in this repo, first you will need to install Rust. There are instructions for installing Rust here: <https://doc.rust-lang.org/book/ch01-01-installation.html>
 
 I am using VS Code as my IDE for this project, so any further instructions will be for using VS Code.
 
-#### VS Code Extensions
+### VS Code Extensions
 
 - C/C++ for Visual Studio Code
   - Extension ID: ms-vscode.cpptools
@@ -32,19 +34,21 @@ I am using VS Code as my IDE for this project, so any further instructions will 
   - Extension ID: DavidAnson.vscode-markdownlint
   - Purpose: (optional) to help with writing the md files for patchnotes and such
 
-> ### Most Recent Patch Notes (as of 04/17/23)
+***
+
+> ### Most Recent Patch Notes (as of 04/21/23)
 >
-> #### Changes
+> ### Changes
+>
+> - Simple Combat
+>   - Enemy NPCs have been added in.
+>   - Functionality for weapons has been added in.
+>
+> ### Bug Fixes
 >
 > - **No Functional Changes for this Patch**
->
-> #### Bug Fixes
->
-> - Room floors are now being initialized correctly
-> - Room announcement has been fixed, multiple valid pathways now get announced properly
-> - Fixed a couple bugs where taking or dropping items was not working properly
-> - Fixed a bug where locked doors where not barring the player from moving through a door
-> - Fixed a bug where the parser was not getting the item name properly (just a case-sensitive issue)
+
+***
 
 ### Version Control
 
@@ -70,7 +74,7 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
 01. ~~Simple Worlds~~
     1. ~~Get the Builder to be able build a world from a source file. For this phase, the rooms will only have NWSE directions.~~
     2. ~~Get the Driver to be able to play through a simple world, mostly just walking between rooms.~~
-02. Simple Items
+02. ~~Simple Items~~
     1. ~~Add simple items the player can "take" and "drop"~~
     2. ~~Create item types: weapon, light source, keys~~
     3. ~~Update Rooms to have a “isLit” flag. If this flag is false, then the room is considered dark.~~
@@ -78,11 +82,11 @@ After version 1.0 has been reached, the version will be some number W.X.Y.Z, whe
     5. ~~Add doors to the rooms that can be locked, requires the right key to go that direction.~~
     6. ~~Update driver to check door locks~~
     7. ~~Update Builder to be able to handle these additions~~
-03. Simple Combat
-    1. Add weapon items for combat
-    2. Add Simple hostile NPCs
-    3. Update the Builder to be able to build NPCs and weapon items
-    4. Update the Driver to be able to handle simple combat where the player and NPC take turns trying to attack each other until one dies.
+03. ~~Simple Combat~~
+    1. ~~Add weapon items for combat~~
+    2. ~~Add Simple hostile NPCs~~
+    3. ~~Update the Builder to be able to build NPCs and weapon items~~
+    4. ~~Update the Driver to be able to handle simple combat where the player and NPC take turns trying to attack each other until one dies.~~
 04. World Saves
     1. Get the Driver to be able to save the state of the world to a file separate from the original source file.
     2. Update the builder to take in a save file (should be a small update)

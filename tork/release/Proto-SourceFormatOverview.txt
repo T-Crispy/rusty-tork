@@ -1,9 +1,10 @@
 #world
 {Name of the world} + '\n'
 {Grue flag} (GRUE/NO GRUE) + '\n'
+"~start " + [starting room id] + '\n'
 #rooms + '\n'
 [for each room]
-    "#" + {room[i] id} + '\n'
+    '#' + {room[i] id} + '\n'
     {room[i] name} + '\n'
     {room[i] desc} + '\n'
     [paths]
@@ -24,3 +25,11 @@
         (for keys: value 1 should match with whatever number lock is goes to)
         (for lights: neither value is important)
         (for wpns: value 1 is the dmg and value 2 is the hit chance)
+            (for hit chance: unit is 0.01%; so 12.5% chance to hit would be "1250")
+#npcs + '\n'
+    '#' + {npc[i] id} + '\n'
+    "~loc " + {room id of location} + '\n'
+    {npc name} + '\n'
+    {npc hit points} + '\n' (max is 65,535)
+    {npc attack dmg} + '\n' (max is 65,535)
+    {npc hit chance} + '\n' (unit is 0.01%; so 12.5% chance to hit would be "1250")

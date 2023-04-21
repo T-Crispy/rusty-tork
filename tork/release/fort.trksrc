@@ -1,6 +1,7 @@
 #world
 Fort Reeve
 GRUE
+~start 0
 #rooms
 #0
 Front Courtyard
@@ -74,3 +75,15 @@ LIT
 ~loc 4
 Torch
 5 | 0
+#3
+WPN
+~loc 5
+sword
+15 | 7500
+#npcs
+#0
+~loc 6
+skeleton
+30
+15
+6000

@@ -1,12 +1,14 @@
 use std::io;
 use std::io::Write;
 use std::ptr;
+use std::ptr::null;
+use rand::Rng;
 
 use crate::world::World;
+use crate::world::State;
 use crate::world::item::{Item, ItemType};
 use crate::world::room::{Directions};
 use crate::world::room::Room;
-use crate::world::player::Player;
 
 pub enum Actions{
     Nvld, //invalid
@@ -19,22 +21,38 @@ pub enum Actions{
     Look,
 }
 
-pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
+pub fn run<'a>(w: &'a mut World) -> (&'a World, State) {
     //initialize input and player
     let mut input = String::new();
     let mut in_dark: bool = false;
 
     while input != "quit" {
+
         //do the grue thing
         if w.grue_enabled && in_dark {
             println!("Oh, no!  A fearsome grue slithered into the room and devoured you.");
-            return (w, true);
+            return (w, State::DEATH);
+        }
+        
+        announce_npcs(w);
+
+        //~~~NPC Action~~~
+        let mut npc_ind = 0;
+        let mut found = false;
+        for (i, npc) in w.npcs.iter().enumerate() {
+            if npc.loc == w.player.loc{
+                npc_ind = i;
+                found = true;
+            }
+        }
+
+        if found{
+            let result = attack_player(w, w.npcs[npc_ind].id);
+            println!("{}",result.1);
         }
 
         //~~~Announce Room~~~
-        unsafe{
-            in_dark = announce_room(&(*player.loc), &w, holding_light(&player, &w));
-        }
+        in_dark = announce_room(&w, holding_light(&w));
 
         //~~~Take Player Input~~~
         print!(">"); 
@@ -80,7 +98,7 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
 
                     //move player
                     if valid_dir {
-                        let result = move_player(player, &w, go);
+                        let result = move_player(w, go);
                         if !result.0 {
                             println!("{}",result.1);
                         }
@@ -95,12 +113,10 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
                 let rem_text = words[1..].join(" ");
 
                 //search for item id by name
-                let result = w.fetch_item_id(&rem_text);
-                if result.1 == true {
-                    let result = take_item(player, w, result.0);
-                    if !result.0{
-                        println!("{}",result.1);
-                    }
+                let fetch_result = w.fetch_item_id(&rem_text);
+                 if fetch_result.1 {
+                    let take_result = take_item(w, fetch_result.0);
+                    println!("{}", take_result.1);
                 }
                 else {
                     println!("You cannot take \"{}\"", rem_text);
@@ -112,7 +128,7 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
                 //search for item id by name
                 let result = w.fetch_item_id(&rem_text);
                 if result.1 == true {
-                    let result = drop_item(player, w, result.0);
+                    let result = drop_item(w, result.0);
                     if !result.0 {
                         println!("{}",result.1);
                     }
@@ -124,7 +140,7 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
             Actions::Inv => {
                 println!("You are holding:");
                 //loop through the player's inventory
-                for item in player.inv.iter() {
+                for item in w.player.inv.iter() {
                     //if that slot is not "empty"
                     if !item.eq(&-1) {
                         //get the index of the item in the world's vector
@@ -140,30 +156,202 @@ pub fn run<'a>(w: &'a mut World, player: &'a mut Player) -> (&'a World, bool) {
                 }
             },
             Actions::Atk => {
-                //add combat stuff here
+                //combat
+                let rem_text = words[1..].join(" ");
+
+                //search for npc by name
+                let result = w.fetch_npc_id(&rem_text);
+                if result.1 {
+                    let result = attack_npc(w, result.0);
+                    println!("{}",result.1);
+                }
+                else {
+                    println!("You cannot attack \"{}\"", rem_text);
+                }
             },
             Actions::Quit => {
-                return (w, true);
+                return (w, State::QUIT);
             },
             Actions::Nvld | _ => println!("The only commands I currently recognize are \"go\", \"walk\", \"take\", \"drop\"or \"quit\""),
-        }
+        }        
 
-        //~~~NPC Action~~~
-        //flag to add
+        //assess player condition
+        if w.player.hit_points == 0 {
+            return (w, State::DEATH);
+        }
 
         //empty line so the turns are easier to make out
         println!("");
     }
 
-    (w, false)
+    (w, State::ERROR)
 }
 
-fn has_key(p: &Player, w: &World, lock: usize) -> bool {
+//returning true = player in darkness
+pub fn announce_room(w: &World, light_held: bool) -> bool {
+    unsafe {
+        let curr_room: &Room = &(*w.player.loc);
+
+        let room_name = &curr_room.name;
+        let room_desc = &curr_room.desc;
+
+        //basic announement
+        println!("{}",room_name);
+        println!("{}",room_desc);
+
+        //announce pathways
+        if (*curr_room).pathways[0].path != ptr::null_mut() {
+            let pres_phrase = &curr_room.pathways[0].pres_phrase;
+            let door_name = &curr_room.pathways[0].name; 
+            println!("{} {} to the North",pres_phrase, door_name);
+        }
+        if (*curr_room).pathways[1].path != ptr::null_mut() {
+            let pres_phrase = &curr_room.pathways[1].pres_phrase;
+            let door_name = &curr_room.pathways[1].name; 
+            println!("{} {} to the East",pres_phrase, door_name);
+        }
+        if (*curr_room).pathways[2].path != ptr::null_mut() {
+            let pres_phrase = &curr_room.pathways[2].pres_phrase;
+            let door_name = &curr_room.pathways[2].name; 
+            println!("{} {} to the South",pres_phrase, door_name);
+        }
+        if (*curr_room).pathways[3].path != ptr::null_mut() {
+            let pres_phrase = &curr_room.pathways[3].pres_phrase;
+            let door_name = &curr_room.pathways[3].name; 
+            println!("{} {} to the West",pres_phrase, door_name);
+        }
+
+        //announce items in room
+        let mut items: Vec<&str> = Vec::new();
+
+        for item in curr_room.floor.iter() {
+            if !item.eq(&-1) {
+                let item_id = item.clone() as usize;
+                let world_ind = (*w).get_item_index(item_id).0;
+
+                items.push((&(*w).items[world_ind].name).as_str());
+            }
+        }
+
+        if items.len() > 0 {
+            println!("The room contains:");
+            for item in items.iter() {
+                println!("{}",item);
+            }
+        }
+
+        //announce darkness
+        if curr_room.dark && !light_held {
+            println!("It is pitch dark. You are likely to be eaten by a grue");
+            return true;
+        }
+    }
+    return false
+}
+
+pub fn announce_npcs(w: &mut World) {
+    //announce an npcs death
+    let mut npc_ind = 0;
+    let mut found: bool = false;
+    for (i, npc) in w.npcs.iter().enumerate() {
+        if npc.loc == w.player.loc && npc.health == 0{
+            println!("{} crunbles into dust",npc.name);
+            npc_ind = i;
+            found = true;
+        }
+    }
+
+    if found {
+        w.npcs[npc_ind].loc = null();
+    }
+}
+
+pub fn attack_npc(w: &mut World, npc_id: usize) -> (bool, String) {
+    let result = w.get_npc_index(npc_id);
+    if result.1 {
+        let npc_ind = result.0;
+        
+        if w.npcs[npc_ind].loc == w.player.loc {
+            let result = w.find_first_item_type(ItemType::WPN);
+            if result.1 {
+                let first_wpn_ind = result.0;
+
+                //get weapon values
+                let wpn_dmg = w.items[first_wpn_ind].val1.clone() as u16;
+                let hit_chance = w.items[first_wpn_ind].val2.clone() as u16 ;
+            
+                //roll for hit
+                if hit_chance <= rand::thread_rng().gen_range(1..=10000) {
+                    //successful hit
+                    if w.npcs[npc_ind].health <= wpn_dmg {
+                        w.npcs[npc_ind].health = 0;
+                    }
+                    else {
+                        w.npcs[npc_ind].health -= wpn_dmg;
+                    }
+                    let mut return_msg = String::from("You hit the ");
+                    return_msg.push_str(&w.npcs[npc_ind].name);
+                    return (true, return_msg);
+                }
+                else {
+                    let mut return_msg = String::from("You miss the ");
+                    return_msg.push_str(&w.npcs[npc_ind].name);
+                    return (true, return_msg);
+                }
+            }
+        }
+        else {
+            //target npc is not in the room w/ player
+            let mut return_msg = String::from("You do not see ");
+            return_msg.push_str(&w.npcs[npc_ind].name.as_str());
+            return (false, return_msg)
+        }
+    }
+    else{
+        return (false, String::from("err: bad npc_id passed to attack_npc"))
+    }
+
+    (false, String::from("err: Unexpected error in attack_npc"))
+}
+
+pub fn attack_player(w: &mut World, npc_id: usize) -> (bool, String) {
+    let result = w.get_npc_index(npc_id);
+    if result.1 {
+        let npc_ind = result.0;
+
+        //assume npc is in the same room as player; this should be checked already
+        let npc_dmg = w.npcs[npc_ind].hit_pwr;
+        let npc_hit_chance = w.npcs[npc_ind].hit_chance;
+
+        if npc_hit_chance <= rand::thread_rng().gen_range(1..=10000) {
+            //npc hit player
+            if w.player.hit_points <= npc_dmg {
+                w.player.hit_points = 0;
+            }
+            else {
+                w.player.hit_points -= npc_dmg;
+            }
+
+            let mut return_msg = String::from(&w.npcs[npc_ind].name);
+            return_msg.push_str(" hit you");
+            return (true, return_msg);
+        }
+        else {
+            let mut return_msg = String::from(&w.npcs[npc_ind].name);
+            return_msg.push_str(" misses you");
+            return (true, return_msg);
+        }
+    }
+
+    (false, String::from("err: Unexpected error in attack_player"))
+}
+
+pub fn has_key(w: &World, lock: usize) -> bool {
     if lock == 0{
         return true;    
     }
 
-    for item in (*p).inv.iter() {
+    for item in w.player.inv.iter() {
         //check if there is an item in the inv slot
         if !item.eq(&-1) {
             //get the index for that item in the World's Item arr
@@ -180,9 +368,9 @@ fn has_key(p: &Player, w: &World, lock: usize) -> bool {
     return false
 }
 
-pub fn holding_light(p: &Player, w: &World) -> bool {
+pub fn holding_light(w: &World) -> bool {
     //loop through player inv
-    for item in (*p).inv.iter() {
+    for item in w.player.inv.iter() {
         //check if inv slot is not empty
         if !item.eq(&-1) {
             let to_check: &Item = &(*w).items[(*item as usize)];
@@ -195,23 +383,25 @@ pub fn holding_light(p: &Player, w: &World) -> bool {
     false
 }
 
-pub fn take_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn take_item(w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         //get item's index of world vector
         let world_ind: usize = w.get_item_index(item_id).0;
 
         //get the room the player is current in
-        let room_ind: usize = w.get_room_index((*(*p).loc).id).0; //wtf is this syntax
+        let room_ind: usize = w.get_room_index((*w.player.loc).id).0; //wtf is this syntax
         let curr_room: &mut Room = &mut (*w).rooms[room_ind];
 
         //check if player inv is full
-        if (*p).count_inv() <= (*p).inv_lim {
+        if w.player.count_inv() <= w.player.inv_lim {
             //add item to player inv
-            if (*p).pocket_item(item_id) {
+            if w.player.pocket_item(item_id) {
                 //remove item from floor
                 if curr_room.handoff_item(item_id) {
                     (*w).items[world_ind].loc = -1;
-                    return (true, String::new());
+                    let mut return_msg = String::from("You have taken ");
+                    return_msg.push_str((*w).items[world_ind].name.as_str());
+                    return (true, return_msg);
                 }
             }
             else {
@@ -226,16 +416,16 @@ pub fn take_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String
     return (false, String::from("err: unexpected error in take_item()"))
 }
 
-pub fn drop_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String) {
+pub fn drop_item(w: &mut World, item_id: usize) -> (bool, String) {
     unsafe {
         let world_ind: usize;
         let play_ind: usize;
-        let room_ind: usize = w.get_room_index((*(*p).loc).id).0; //wtf is this syntax
+        let room_ind: usize = w.get_room_index((*(w.player).loc).id).0; //wtf is this syntax
 
         //get item's index of world vector
         world_ind = w.get_item_index(item_id).0;
         //get item's index for player inventory
-        let result = (*p).get_inv_ind(item_id);
+        let result = w.player.get_inv_ind(item_id);
         play_ind = result.0;
 
         let curr_room: &mut Room = &mut (*w).rooms[room_ind];
@@ -245,7 +435,7 @@ pub fn drop_item(p: &mut Player, w: &mut World, item_id: usize) -> (bool, String
             //check if the item was found in player inv
             if result.1 {
                 //set player.inv[n] to -1 (that slot is now "empty")
-                (*p).drop_item(play_ind);
+                w.player.drop_item(play_ind);
                 
                 //set item's location
                 w.items[world_ind].loc = (*curr_room).id as isize;
@@ -281,68 +471,10 @@ pub fn parse_action(input: &str) -> Actions {
     action
 }
 
-//returning true = player in darkness
-pub fn announce_room(curr_room: &Room, w: &World, light_held: bool) -> bool {
-    let room_name = &curr_room.name;
-    let room_desc = &curr_room.desc;
-
-    //basic announement
-    println!("{}",room_name);
-    println!("{}",room_desc);
-
-    //announce pathways
-    if (*curr_room).pathways[0].path != ptr::null_mut() {
-        let pres_phrase = &curr_room.pathways[0].pres_phrase;
-        let door_name = &curr_room.pathways[0].name; 
-        println!("{} {} to the North",pres_phrase, door_name);
-    }
-    if (*curr_room).pathways[1].path != ptr::null_mut() {
-        let pres_phrase = &curr_room.pathways[1].pres_phrase;
-        let door_name = &curr_room.pathways[1].name; 
-        println!("{} {} to the East",pres_phrase, door_name);
-    }
-    if (*curr_room).pathways[2].path != ptr::null_mut() {
-        let pres_phrase = &curr_room.pathways[2].pres_phrase;
-        let door_name = &curr_room.pathways[2].name; 
-        println!("{} {} to the South",pres_phrase, door_name);
-    }
-    if (*curr_room).pathways[3].path != ptr::null_mut() {
-        let pres_phrase = &curr_room.pathways[3].pres_phrase;
-        let door_name = &curr_room.pathways[3].name; 
-        println!("{} {} to the West",pres_phrase, door_name);
-    }
-
-    //announce items in room
-    let mut items: Vec<&str> = Vec::new();
-
-    for item in curr_room.floor.iter() {
-        if !item.eq(&-1) {
-            let item_id = item.clone() as usize;
-            let world_ind = (*w).get_item_index(item_id).0;
-
-            items.push((&(*w).items[world_ind].name).as_str());
-        }
-    }
-
-    if items.len() > 0 {
-        println!("The room contains:");
-        for item in items.iter() {
-            println!("{}",item);
-        }
-    }
-
-    //announce darkness
-    if curr_room.dark && !light_held {
-        println!("It is pitch dark. You are likely to be eaten by a grue");
-        return true;
-    }
-    return false
-}
-
-pub fn move_player(player: &mut Player, w: &World, dir: Directions) -> (bool, String) {
+pub fn move_player(w: &mut World, dir: Directions) -> (bool, String) {
     unsafe {
         //get the next room the player wants to go to
-        let next_door = &(*player.loc).pathways[dir as usize];
+        let next_door = &(*w.player.loc).pathways[dir as usize];
         let next_room = next_door.path;
 
         //make sure that direction isn't NULL
@@ -352,7 +484,7 @@ pub fn move_player(player: &mut Player, w: &World, dir: Directions) -> (bool, St
             let mobile: bool;
 
             //check if door is locked and if player has the key
-            if next_door.lock.eq(&0) || has_key(player, w, next_door.lock) {
+            if next_door.lock.eq(&0) || has_key(w, next_door.lock) {
                 mobile = true;
             }
             else{
@@ -361,7 +493,7 @@ pub fn move_player(player: &mut Player, w: &World, dir: Directions) -> (bool, St
 
             if mobile {
                 //change player's location
-                player.loc = next_room;
+                w.player.loc = next_room;
                 return (true, String::new());
             }
             else{

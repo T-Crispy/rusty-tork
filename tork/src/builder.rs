@@ -1,17 +1,20 @@
 use crate::world::World;
 use crate::world::item::Item;
 use crate::world::item::ItemType;
+use crate::world::npc::NPC;
 use crate::world::room::Doorway;
 use crate::world::room::Room;
+use crate::world::player::Player;
 
 //use core::num;
 use std::fs;
 use std::ptr;
+use std::ptr::null;
 
 pub fn build_world(filename: String) -> (World, String) {
     let mut build_msg = String::from("");
  
-    let world_dec_lines: usize = 2;
+    let world_dec_lines: usize = 3;
 
     let room_dec_lines: usize = 8;
     let num_paths: usize = 4;
@@ -22,9 +25,19 @@ pub fn build_world(filename: String) -> (World, String) {
 
     let item_dec_lines: usize = 5;
 
-    let headers: Vec<&str> = vec!["#world","#rooms", "#items"];
+    let npc_dec_lines: usize = 6;
 
-    let mut to_build = World{name: String::from("new world"), rooms: Vec::new(), items: Vec::new(), grue_enabled: false};
+    let headers: Vec<&str> = vec!["#world","#rooms", "#items", "#npcs"];
+
+    let mut to_build = World{name: String::from("new world"), 
+                            rooms: Vec::new(), 
+                            items: Vec::new(),
+                            npcs: Vec::new(),
+                            grue_enabled: false,
+                            player: Player{ loc: null(),
+                                            inv: [-1; 7],
+                                            inv_lim: 7,
+                                            hit_points: 100}};
     
     //let mut finished = false;
     let contents = fs::read_to_string(filename)
@@ -41,6 +54,9 @@ pub fn build_world(filename: String) -> (World, String) {
     let mut items_ind: isize = -1;
     let mut items_end: usize = 0;
 
+    let mut npcs_ind: isize = -1;
+    let mut npcs_end: usize = 0;
+
     //check for headers
     let mut i: usize = 0;
     //for mut i in 0..lines.len()
@@ -49,60 +65,82 @@ pub fn build_world(filename: String) -> (World, String) {
         let mut curr_line = lines[i];
 
         //check for headers
-        if curr_line == "#world" {
-            world_ind = i as isize;
+        match curr_line {
+            "#world" => {
+                world_ind = i as isize;
 
-            i += 1;
-            curr_line = lines[i];
-
-            while !(headers.contains(&curr_line)) && i < lines.len(){
-                curr_line = lines[i];
                 i += 1;
-            }
+                curr_line = lines[i];
 
-            if i != lines.len() {
-                i -= 1;
-            }
+                while !(headers.contains(&curr_line)) && i < lines.len(){
+                    curr_line = lines[i];
+                    i += 1;
+                }
+
+                if i != lines.len() {
+                    i -= 1;
+                }
             
-            world_end = i;
-            i -= 1;
-        }
-        else if curr_line == "#rooms" {
-            rooms_ind = i as isize;
-
-            i += 1;
-            curr_line = lines[i];
-
-            while !(headers.contains(&curr_line)) && i < lines.len(){
-                //continue iterating until the next header is reached or the end of line
-                curr_line = lines[i];
-                i += 1;
-            }
-
-            if i != lines.len() {
+                world_end = i;
                 i -= 1;
-            }
-            rooms_end = i;
-            i -= 1;
-        }
-        else if curr_line == "#items" {
-            items_ind = i as isize;
+            },
+            "#rooms" => {
+                rooms_ind = i as isize;
 
-            i += 1;
-            curr_line = lines[i];
-
-            while !(headers.contains(&curr_line)) && i < lines.len() {
-                //continue iterating until the next header
-                curr_line = lines[i];
                 i += 1;
-            }
+                curr_line = lines[i];
+    
+                while !(headers.contains(&curr_line)) && i < lines.len(){
+                    //continue iterating until the next header is reached or the end of line
+                    curr_line = lines[i];
+                    i += 1;
+                }
+    
+                if i != lines.len() {
+                    i -= 1;
+                }
+                rooms_end = i;
+                i -= 1;                
+            },
+            "#items" => {
+                items_ind = i as isize;
 
-            if i != lines.len() {
+                i += 1;
+                curr_line = lines[i];
+    
+                while !(headers.contains(&curr_line)) && i < lines.len() {
+                    //continue iterating until the next header
+                    curr_line = lines[i];
+                    i += 1;
+                }
+    
+                if i != lines.len() {
+                    i -= 1;
+                }
+                items_end = i;
+                i -= 1;                
+            },
+            "#npcs" => {
+                npcs_ind = i as isize;
+
+                i += 1;
+                curr_line = lines[i];
+
+                while !(headers.contains(&curr_line)) && i < lines.len() {
+                    //continue iterating until the next header
+                    curr_line = lines[i];
+                    i += 1;
+                }
+
+                if i != lines.len() {
+                    i -= 1;
+                }
+                npcs_end = i;
                 i -= 1;
-            }
-            items_end = i;
-            i -= 1;
+            },
+            _ => {}
         }
+
         i += 1;
     } //end header check
 
@@ -115,11 +153,15 @@ pub fn build_world(filename: String) -> (World, String) {
     if items_ind == -1{
         return (to_build, String::from("err: #items header missing"));
     }
+    if npcs_ind == -1{
+        return (to_build, String::from("err: #npcs header missing"));
+    }
 
     
     let world_ind: usize = world_ind as usize;
     let num_world_lines: usize = world_end - world_ind - 1;
     let mut world_vec = vec![""; num_world_lines];
+    let mut start_loc_id: usize = 0;
 
     let rooms_ind: usize = rooms_ind as usize;
     let num_rooms: usize = rooms_end - rooms_ind - 1;
@@ -128,6 +170,10 @@ pub fn build_world(filename: String) -> (World, String) {
     let items_ind: usize = items_ind as usize;
     let num_items: usize = items_end - items_ind - 1;
     let mut items_vec = vec![""; num_items];
+
+    let npcs_ind: usize = npcs_ind as usize;
+    let num_npcs: usize = npcs_end - npcs_ind - 1;
+    let mut npcs_vec = vec![""; num_npcs];
 
     //~~~~~~~fecthing world info~~~~~~~~~
     if num_world_lines % world_dec_lines == 0 {
@@ -139,14 +185,19 @@ pub fn build_world(filename: String) -> (World, String) {
 
         to_build.name = world_vec[0].to_string();
         
-        if world_vec[1] == "GRUE" {
-            to_build.grue_enabled = true;
+        match world_vec[1] {
+            "GRUE" => { to_build.grue_enabled = true; },
+            "NO GRUE" => { to_build.grue_enabled = false; },
+            _ => {} //flag add in an error message
         }
-        else if world_vec[1] == "NO GRUE" {
-            to_build.grue_enabled = false;
-        }
-        else {
-            //flag add in error message
+
+        //get starting location
+        if world_vec[2].starts_with("~start") {
+            let result = world_vec[2].trim_start_matches("~start").trim().parse::<usize>();
+            if result.is_err() {
+                return (to_build, String::from("err: Could not parse the ID number for start location"));
+            }
+            start_loc_id = result.unwrap();
         }
     }
 
@@ -292,6 +343,19 @@ pub fn build_world(filename: String) -> (World, String) {
             }//end for j loop
         }//end for i loop
 
+
+        //set the starting location for the world
+        let result = to_build.get_room_index(start_loc_id);
+        if result.1 {
+            let start_loc_ind = result.0;
+            to_build.player.loc = &to_build.rooms[start_loc_ind];
+        }
+        else {
+            let mut err_msg = String::from("err: could not find a room with ID: ");
+            err_msg.push_str(start_loc_id.to_string().as_str());
+            err_msg.push_str(" for starting location");
+            return (to_build,err_msg);
+        }
     }
     else {
         return (to_build, String::from("err: number of lines under #rooms header are off. Double check the room lines"));
@@ -322,7 +386,7 @@ pub fn build_world(filename: String) -> (World, String) {
         for i in 0..num_items{
             let offset: usize = i * item_dec_lines;
 
-            //get room ID
+            //get item ID
             if items_vec[offset].starts_with('#') {
                 let id_parse_result = items_vec[offset].trim().trim_start_matches('#').parse::<usize>();
                 if id_parse_result.is_err(){
@@ -381,6 +445,115 @@ pub fn build_world(filename: String) -> (World, String) {
     }
     else {
         return (to_build, String::from("err: number of lines under #items header are off. Double check the item lines"));
+    }
+
+    //fetching npc information
+    if num_npcs % npc_dec_lines == 0 {
+        //get the sub_arr for the npc stuff
+        let left_ind = npcs_ind + 1;
+        let right_ind = npcs_end;
+        npcs_vec.clone_from_slice(&lines[left_ind..right_ind]);
+
+        //get the number of npcs
+        let num_npcs: usize = npcs_vec.len() / npc_dec_lines;
+
+        //initialize to_build's npc`s
+        let null_npc: NPC = NPC { id: 0, 
+                                loc: null(), 
+                                name: String::from(""),
+                                health: 0, 
+                                hit_pwr: 0, 
+                                hit_chance: 0 };
+        to_build.npcs = vec![null_npc; num_npcs];
+        
+        for i in 0..num_npcs {
+            let offset: usize = i * npc_dec_lines;
+
+            //get npc ID
+            if npcs_vec[offset].starts_with('#') {
+                let id_parse_result = npcs_vec[offset].trim_start_matches('#').parse::<usize>();
+                if id_parse_result.is_err() {
+                    let mut err_msg = String::from("err: Could not parse the ID number for NPC ");
+                    err_msg.push_str(offset.to_string().as_str());
+                    return (to_build, err_msg);
+                }
+                to_build.npcs[i].id = id_parse_result.unwrap();
+            }
+            else {
+                //flag add error message
+            }
+
+            //get the NPCs starting location
+            if npcs_vec[offset + 1].starts_with("~loc") {
+                let id_parse_result = npcs_vec[offset + 1].trim_start_matches("~loc").trim().parse::<usize>();
+                if id_parse_result.is_err() {
+                    let mut err_msg = String::from("err: Could not parse the Room ID number for NPC ");
+                    err_msg.push_str(offset.to_string().as_str());
+                    return (to_build, err_msg);
+                }
+
+                //get the starting location of the NPC
+                let result = to_build.get_room_index(id_parse_result.unwrap());
+                if result.1 {
+                    let start_loc_ind = result.0;
+                    to_build.npcs[i].loc = &to_build.rooms[start_loc_ind];
+                }
+                else {
+                    let mut err_msg = String::from("err: could not find a room with ID: ");
+                    err_msg.push_str(start_loc_id.to_string().as_str());
+                    err_msg.push_str(" for NPC #");
+                    err_msg.push_str(to_build.npcs[i].id.to_string().as_str());
+                    err_msg.push_str("\'s starting location");
+                    return (to_build,err_msg);
+                }
+            }
+            else {
+                //flag add error message
+            }
+
+            //get npc name
+            to_build.npcs[i].name = npcs_vec[offset + 2].to_string();
+
+            //get npc hp
+            let parse_result = npcs_vec[offset + 3].parse::<u16>();
+            if parse_result.is_err() {
+                let mut err_msg = String::from("err: could not parse the Hit Points for NPC #");
+                err_msg.push_str(to_build.npcs[i].id.to_string().as_str());
+                err_msg.push_str(". Make sure the max value of 65,535 has not been exceeded");
+                return (to_build,err_msg);
+            }
+            else {
+                to_build.npcs[i].health = parse_result.unwrap();
+            }
+
+            //get npc attack dmg
+            let parse_result = npcs_vec[offset + 4].parse::<u16>();
+            if parse_result.is_err() {
+                let mut err_msg = String::from("err: could not parse the Attack Damage for NPC #");
+                err_msg.push_str(to_build.npcs[i].id.to_string().as_str());
+                err_msg.push_str(". Make sure the max value of 65,535 has not been exceeded");
+                return (to_build,err_msg);
+            }
+            else {
+                to_build.npcs[i].hit_pwr = parse_result.unwrap();
+            }
+
+            //get npc hit chance
+            let parse_result = npcs_vec[offset + 5].parse::<u16>();
+            if parse_result.is_err() {
+                let mut err_msg = String::from("err: could not parse the Hit-chance for NPC #");
+                err_msg.push_str(to_build.npcs[i].id.to_string().as_str());
+                err_msg.push_str(". Make sure the max value of 65,535 has not been exceeded");
+                return (to_build,err_msg);
+            }
+            else {
+                to_build.npcs[i].hit_chance = parse_result.unwrap();
+            }
+
+        }//end for i loop
+    }
+    else{
+        return (to_build, String::from("err: number of lines under #npcs header are off. Double check the npc lines"));
     }
 
     build_msg.push_str("success");

@@ -13,6 +13,9 @@ For The Driver, users need to know the current commands, which are:
     -"inv" / "i" / "inventory": prints all the items in the players inventory.
         > this command requires nothing after the command word itself
         > (the current inventory limit is 7)
+    -"attack" / "kill": attacks a given enemy with the first item in the player's inventory
+        > format: "{attack/kill} {npc name}"
+        > Tork (currently) will use the first wpn in inventory for the attack 
     -"quit": ends the current game, exiting The Driver
 
-    ("look" & "attack" are currently parsed, but nothing it done with them yet)
+    ("look" is currently parsed, but nothing it done with them yet)

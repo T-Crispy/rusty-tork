@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::fs::OpenOptions;
 
 use crate::world::World;
+use crate::world::State;
 use crate::world::player::Player;
 
 pub mod builder;
@@ -16,9 +17,9 @@ pub mod world;
 fn main() {
     let dir: PathBuf = env::current_dir().unwrap();
     let mut running: bool = true;
-    let ver = "v0.2.7.0";
+    let ver = env!("CARGO_PKG_VERSION");
 
-    println!("Welcome to Tork {}!", ver);
+    println!("Welcome to Tork v0.{}!", ver);
  
     while running{
         let mut file_name = String::new();
@@ -78,9 +79,18 @@ fn main() {
                 }
 
                 println!("Starting {}...\n", &built_world.name);
-                let result: (&World, bool) = driver::run(&mut built_world, &mut player);
-                if !result.1 {
-                    print!("An Error was encountered while running the world");
+                let result = driver::run(&mut built_world);
+                match result.1 {
+                    State::ERROR => {
+                        println!("An Error was encountered while running the world");
+                    },
+                    State::QUIT => {},
+                    State::RESTART => {},
+                    State::DEATH => {
+                        println!("~YOU DIED~");
+                    },
+                    State::SAVE => {},
+                    _ => {},
                 }
             }
             else {
