@@ -7,6 +7,7 @@ use rand::Rng;
 use crate::world::World;
 use crate::world::State;
 use crate::world::item::{Item, ItemType};
+use crate::world::player;
 use crate::world::room::{Directions};
 use crate::world::room::Room;
 
@@ -25,8 +26,12 @@ pub fn run<'a>(w: &'a mut World) -> (&'a World, State) {
     //initialize input and player
     let mut input = String::new();
     let mut in_dark: bool = false;
+    let mut player_seen: bool = false;
 
     while input != "quit" {
+
+        //~~~Announce Room~~~
+        in_dark = announce_room(&w, holding_light(&w));
 
         //do the grue thing
         if w.grue_enabled && in_dark {
@@ -47,12 +52,17 @@ pub fn run<'a>(w: &'a mut World) -> (&'a World, State) {
         }
 
         if found{
-            let result = attack_player(w, w.npcs[npc_ind].id);
+            if player_seen{
+                let result = attack_player(w, w.npcs[npc_ind].id);
             println!("{}",result.1);
+            }
+            else {
+                player_seen = true;
+            }
         }
-
-        //~~~Announce Room~~~
-        in_dark = announce_room(&w, holding_light(&w));
+        else {
+            player_seen = false;
+        }
 
         //~~~Take Player Input~~~
         print!(">"); 
@@ -250,19 +260,30 @@ pub fn announce_room(w: &World, light_held: bool) -> bool {
 }
 
 pub fn announce_npcs(w: &mut World) {
-    //announce an npcs death
+    
     let mut npc_ind = 0;
     let mut found: bool = false;
+    let mut npc_dead: bool = false;
     for (i, npc) in w.npcs.iter().enumerate() {
-        if npc.loc == w.player.loc && npc.health == 0{
-            println!("{} crunbles into dust",npc.name);
+        if npc.loc == w.player.loc{
+            if npc.health == 0 {
+                npc_dead = true;
+            }
+
             npc_ind = i;
             found = true;
         }
     }
 
     if found {
-        w.npcs[npc_ind].loc = null();
+        if npc_dead {
+            //announce NPC death
+            println!("{} crumbles into dust",w.npcs[npc_ind].name);
+            w.npcs[npc_ind].loc = null();
+        }
+        else {
+            println!("There is a {}", w.npcs[npc_ind].name);
+        }
     }
 }
 
@@ -281,7 +302,8 @@ pub fn attack_npc(w: &mut World, npc_id: usize) -> (bool, String) {
                 let hit_chance = w.items[first_wpn_ind].val2.clone() as u16 ;
             
                 //roll for hit
-                if hit_chance <= rand::thread_rng().gen_range(1..=10000) {
+                let roll = rand::thread_rng().gen_range(1..=10000);
+                if roll <= hit_chance {
                     //successful hit
                     if w.npcs[npc_ind].health <= wpn_dmg {
                         w.npcs[npc_ind].health = 0;
@@ -323,7 +345,8 @@ pub fn attack_player(w: &mut World, npc_id: usize) -> (bool, String) {
         let npc_dmg = w.npcs[npc_ind].hit_pwr;
         let npc_hit_chance = w.npcs[npc_ind].hit_chance;
 
-        if npc_hit_chance <= rand::thread_rng().gen_range(1..=10000) {
+        let roll = rand::thread_rng().gen_range(1..=10000);
+        if roll <= npc_hit_chance {
             //npc hit player
             if w.player.hit_points <= npc_dmg {
                 w.player.hit_points = 0;
