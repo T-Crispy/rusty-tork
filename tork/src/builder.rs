@@ -559,3 +559,11 @@ pub fn build_world(filename: String) -> (World, String) {
     build_msg.push_str("success");
     (to_build,build_msg)
 }
+
+pub fn save_world(filename: String, w: World) -> String {
+    let to_ret = String::from("");
+
+    //
+
+    to_ret
+}

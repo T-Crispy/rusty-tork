@@ -79,18 +79,23 @@ fn main() {
                 }
 
                 println!("Starting {}...\n", &built_world.name);
-                let result = driver::run(&mut built_world);
-                match result.1 {
-                    State::ERROR => {
-                        println!("An Error was encountered while running the world");
-                    },
-                    State::QUIT => {},
-                    State::RESTART => {},
-                    State::DEATH => {
-                        println!("~YOU DIED~");
-                    },
-                    State::SAVE => {},
-                    _ => {},
+
+                //do while loop
+                loop {
+                    let result: (&World, State) = driver::run(&mut built_world);
+
+                    match result.1 {
+                        State::ERROR => {
+                            println!("An Error was encountered while running the world"); break;
+                        },
+                        State::QUIT => { break; },
+                        State::RESTART => {},
+                        State::DEATH => {
+                            println!("~YOU DIED~"); break;
+                        },
+                        State::SAVE => {},
+                        _ => { break; },
+                    }
                 }
             }
             else {
